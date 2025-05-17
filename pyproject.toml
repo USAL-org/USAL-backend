@@ -1,0 +1,11 @@
+[project]
+name = "usal-backend"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi>=0.115.12",
+    "gel>=3.1.0",
+    "pre-commit>=4.2.0",
+]
