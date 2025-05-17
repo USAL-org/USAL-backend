@@ -1,0 +1,12 @@
+module default {
+    type Admin extending DateTime {
+        required username -> str {
+            constraint exclusive;
+        };
+        required email -> str {
+            constraint exclusive;
+        };
+        required password_hash -> str;
+        pp_url -> str;
+    }
+}

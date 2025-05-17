@@ -1,0 +1,5 @@
+module default {
+    type ArticleCategory extending DateTime {
+        required property name -> str;    
+    }
+}

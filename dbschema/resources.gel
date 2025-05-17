@@ -1,0 +1,14 @@
+module default {
+    scalar type ResourceStatus extending enum<ACTIVE,INACTIVE>;
+
+
+    type Resources extending DateTime {
+        required property title -> str;
+        required property image -> str;
+        required property description -> str;
+        required property file -> str;
+        required property status -> ResourceStatus{
+            default := ResourceStatus.ACTIVE;
+        }
+    }
+}

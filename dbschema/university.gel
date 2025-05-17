@@ -1,0 +1,26 @@
+module default {
+    scalar type UniversityStatus extending enum<ACTIVE,INACTIVE>;
+
+
+    type University extending DateTime {
+        required property name -> str;    
+        required property location -> str;
+        required property image -> str;
+        pp_url -> str;
+        application_fee -> bool;
+        community_college -> bool;
+        required state -> State;
+        description -> str;
+        required property acceptance_rate -> str;
+        required property annual_fee -> str;
+        student_faculty_ratio -> str;
+        multi available_majors -> Major;
+        required multi admission_requirements -> str;
+        property view_count -> int32{
+            default := 0;
+        }
+        required property status -> UniversityStatus{
+            default := UniversityStatus.ACTIVE;
+        }
+    }
+}

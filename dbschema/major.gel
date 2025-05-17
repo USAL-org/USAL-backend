@@ -1,0 +1,6 @@
+module default {
+    type Major extending DateTime {
+        required property name -> str;    
+        description -> str;
+    }
+}

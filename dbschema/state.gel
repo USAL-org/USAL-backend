@@ -1,0 +1,5 @@
+module default {
+    type State extending DateTime {
+        required property name -> str;    
+    }
+}

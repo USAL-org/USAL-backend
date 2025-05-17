@@ -1,0 +1,11 @@
+module default {
+
+    type Author extending DateTime {
+        required property full_name -> str;
+        required property email -> str;
+        pp_url -> str;
+        required property short_description -> str;
+        description -> str;
+        multi social_links -> str;
+    }
+}
