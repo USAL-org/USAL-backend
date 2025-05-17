@@ -1,0 +1,15 @@
+module default {
+    scalar type QAStatus extending enum<ACTIVE,INACTIVE>;
+    scalar type QAType extending enum<UNIVERSITY,ACADEMIC,FINANCIAL,PERSONAL,GRADUATE,POST_GRADUATE,PHD,FAMILY>;
+
+    type QASection extending DateTime {
+        required property question -> str;
+        required property answer -> str;
+        required property status -> QAStatus{
+            default := QAStatus.ACTIVE;
+        }
+        required property type -> QAType{
+            default := QAType.UNIVERSITY;
+        }
+    }
+}

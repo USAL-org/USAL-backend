@@ -1,0 +1,20 @@
+module default {
+    scalar type ArticleType extending enum<NEWS,BLOG>;
+    scalar type ArticleStatus extending enum<ACTIVE,INACTIVE>;
+
+    type Article extending DateTime {
+        required property title -> str;
+        required property cover_image -> str;
+        time_elascate -> str;
+        multi media -> str;
+        required property content -> str;
+        required property type -> ArticleType{
+            default := ArticleType.BLOG;
+        }
+        required author -> Author;
+        required category -> ArticleCategory;
+        required property status -> ArticleStatus{
+            default := ArticleStatus.ACTIVE;
+        }
+    }
+}
