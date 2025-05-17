@@ -1,0 +1,10 @@
+ module default{
+  abstract type DateTime {
+    required property created_at -> datetime {
+      default := datetime_current();
+    }
+    required property updated_at -> datetime {
+      default := datetime_current();
+    }
+  }
+}
