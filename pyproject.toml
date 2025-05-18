@@ -9,5 +9,6 @@ dependencies = [
     "fastapi[standard]>=0.115.12",
     "gel>=3.1.0",
     "pre-commit>=4.2.0",
+    "pydantic>=2.11.4",
     "wireup==0.14.0",
 ]

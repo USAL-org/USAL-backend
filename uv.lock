@@ -571,6 +571,7 @@ dependencies = [
     { name = "fastapi", extra = ["standard"] },
     { name = "gel" },
     { name = "pre-commit" },
+    { name = "pydantic" },
     { name = "wireup" },
 ]
 
@@ -580,6 +581,7 @@ requires-dist = [
     { name = "fastapi", extras = ["standard"], specifier = ">=0.115.12" },
     { name = "gel", specifier = ">=3.1.0" },
     { name = "pre-commit", specifier = ">=4.2.0" },
+    { name = "pydantic", specifier = ">=2.11.4" },
     { name = "wireup", specifier = "==0.14.0" },
 ]
 
