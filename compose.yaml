@@ -1,0 +1,65 @@
+services:
+  usal.app:
+    container_name: usal.app
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: ${TARGET:-${ENV:-local}}
+    environment:
+      - ENV=${ENV:-local}
+    ports:
+      - 3333:8000
+      - 4444:5678
+    depends_on:
+      usal.db:
+        condition: service_healthy
+    networks:
+      - usal-net
+    develop:
+      watch:
+        - action: sync
+          path: .
+          target: /project
+          ignore:
+            - .venv/
+        - action: rebuild
+          path: ./pyproject.toml
+        - action: rebuild
+          path: ./Makefile
+        - action: rebuild
+          path: ./configs/local.yaml
+
+  usal.db:
+    container_name: usal.db
+    image: geldata/gel
+    hostname: usal.db
+    environment:
+      - GEL_SERVER_ADMIN_UI=enabled
+      - GEL_SERVER_USER=usal
+      - GEL_SERVER_PASSWORD=usal@12345
+      - GEL_SERVER_TLS_CERT_FILE=/tls/edgedb.crt
+      - GEL_SERVER_TLS_KEY_FILE=/tls/edgedb.key
+    volumes:
+      - ./configs/tls:/tls
+      - ./dbschema:/dbschema
+      - usal-db:/var/lib/gel/data
+    ports:
+      - 5555:5656
+    healthcheck:
+      test:
+        ["CMD", "curl", "-kf", "https://usal.db:5656/server/status/alive"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 8s
+    networks:
+      - usal-net
+
+volumes:
+  usal-db:
+    name: usal-db
+
+networks:
+  usal-net:
+    name: usal-net
+    driver: bridge
