@@ -10,7 +10,7 @@ from usal.domain.entities.article_entity import (
 )
 
 
-class AuthorRepo(DbRepo):
+class ArticleRepo(DbRepo):
     @abstractmethod
     async def create_article(
         self,
@@ -74,7 +74,7 @@ class AuthorRepo(DbRepo):
     #     """
 
     @abstractmethod
-    async def list_all_articles(self) -> ListArticlesEntity:
+    async def list_all_articles(self, type: ArticleType) -> ListArticlesEntity:
         """
         List all articles.
 
@@ -124,7 +124,7 @@ class AuthorRepo(DbRepo):
         """
 
     @abstractmethod
-    async def list_user_articles(self) -> ListArticlesEntity:
+    async def list_user_articles(self, type: ArticleType) -> ListArticlesEntity:
         """
         List all articles.
 

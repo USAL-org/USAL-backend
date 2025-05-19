@@ -52,6 +52,7 @@ class GetArticleByIdResultAuthor(NoPydanticValidation):
 @dataclasses.dataclass
 class GetArticleByIdResultCategory(NoPydanticValidation):
     id: uuid.UUID
+    name: str
 
 
 async def get_article_by_id(
@@ -69,7 +70,10 @@ async def get_article_by_id(
             duration,
             media,
             content,
-            category,
+            category:{
+                id,
+                name
+            },
             author: {
                 id,
                 full_name,

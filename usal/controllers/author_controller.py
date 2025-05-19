@@ -5,6 +5,7 @@ from usal.api.schema.response.author_response import (
 )
 from usal.core.api_response import APIResponse, api_response
 from usal.api.schema.response.common_response import MessageResponse
+from usal.usecases.author_usecase import AuthorUsecase
 
 
 class AuthorController:

@@ -43,6 +43,6 @@ class ArticleFilterRequest(PaginationRequest):
     """
 
     search: str | None = Field(None, description="Title of the article.")
-    type: ArticleType | None = Field(
-        None, description="Type of the article. Can be either 'news' or 'blog'."
+    type: ArticleType = Field(
+        description="Type of the article. Can be either 'news' or 'blog'."
     )

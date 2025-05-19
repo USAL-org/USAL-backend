@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from wireup import Inject
 
 from usal.api.schema.request.article_request import (
@@ -50,8 +50,8 @@ async def create_article(
 
 @AdminRouter.get("/article")
 async def list_all_articles(
-    filter: ArticleFilterRequest,
     controller: Annotated[ArticleController, Inject()],
+    filter: ArticleFilterRequest = Depends(ArticleFilterRequest),
 ) -> APIResponse[ListArticlesResponse]:
     return await controller.list_all_articles(filter)
 

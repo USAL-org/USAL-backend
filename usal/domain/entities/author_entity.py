@@ -1,3 +1,4 @@
+from uuid import UUID
 from usal.core import BaseEntity
 
 
@@ -15,13 +16,13 @@ class ViewAuthorDetailsEntity(BaseEntity):
     Response to view an author.
     """
 
-    id: str
+    id: UUID
     full_name: str
     email: str
     pp_url: str | None
     short_description: str
     description: str | None
-    social_links: list[AuthorSocialLinkEntity] | None
+    social_links: list[str] | None
 
 
 class GetAuthorEntity(BaseEntity):
@@ -29,7 +30,7 @@ class GetAuthorEntity(BaseEntity):
     Response to get an author.
     """
 
-    id: str
+    id: UUID
     full_name: str
     pp_url: str | None
 

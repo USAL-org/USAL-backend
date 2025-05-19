@@ -13,6 +13,7 @@ from usal.api.schema.response.article_response import (
 )
 from usal.core.api_response import APIResponse, api_response
 from usal.api.schema.response.common_response import MessageResponse
+from usal.usecases.article_usecase import ArticleUsecase
 
 
 class ArticleController:
@@ -40,7 +41,6 @@ class ArticleController:
         )
         return api_response(
             ListArticlesResponse(
-                **articles_obj.page_info.model_dump(),
                 records=[
                     GetArticleResponse.model_validate(article, from_attributes=True)
                     for article in articles_obj.records
@@ -62,7 +62,7 @@ class ArticleController:
     async def list_all_article_categories(
         self,
     ) -> APIResponse[ListArticleCategoriesResponse]:
-        category_obj = await self.usecase.list_user_articles()
+        category_obj = await self.usecase.list_all_article_categories()
         return api_response(
             ListArticleCategoriesResponse(
                 records=[
@@ -83,7 +83,6 @@ class ArticleController:
         )
         return api_response(
             ListArticlesResponse(
-                **articles_obj.page_info.model_dump(),
                 records=[
                     GetArticleResponse.model_validate(article, from_attributes=True)
                     for article in articles_obj.records

@@ -6,7 +6,10 @@ SELECT Article {
     duration,
     media,
     content,
-    category,
+    category:{
+        id,
+        name
+    },
     author: {
         id,
         full_name,
