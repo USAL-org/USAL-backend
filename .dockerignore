@@ -1,0 +1,46 @@
+# Misc
+.vscode/
+.idea/
+.DS_Store
+.ruff_cache/
+playground/
+
+# Docker related
+docker/
+docker-compose.yaml
+
+# Python cache files
+**/__pycache__/
+
+# Poetry cache and virtual environment
+.poetry/
+.pytest_cache/
+.venv/
+venv/
+poetry.toml
+
+# Development and test files
+tests/
+tests.py
+pytest.ini
+
+# Local or development-specific files or directories
+*.log
+*.db
+
+# Version control files
+.git/
+.gitignore
+.github/
+.pre-commit-config.yaml
+
+# Temporary or build files
+*.tmp
+*.bak
+
+# Sensitive or confidential data (e.g., credentials)
+secrets.txt
+staging-db.dump
+
+# Ruff
+ruff.toml
