@@ -4,3 +4,7 @@
 
 # Python
 __pycache__/
+
+#configs
+configs/prod.yaml
+configs/local.yaml

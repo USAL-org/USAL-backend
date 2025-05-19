@@ -1,0 +1,4 @@
+SELECT ArticleCategory {
+    id,
+    name
+}
