@@ -1,9 +1,0 @@
-database:
-  user: usal
-  password: usal@12345
-  host: usal.db
-  port: 5656
-  branch: main
-  instance: usal
-  timezone: Asia/Kathmandu
-  tls_file: configs/tls/edgedb.crt
