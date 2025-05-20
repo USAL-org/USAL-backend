@@ -33,7 +33,7 @@ async def create_author(
     return await controller.create_author(request)
 
 
-@AdminRouter.get("/author")
+@AdminRouter.get("/authors")
 async def list_all_author(
     controller: Annotated[AuthorController, Inject()],
 ) -> APIResponse[ListAuthorsResponse]:
@@ -48,7 +48,7 @@ async def create_article(
     return await controller.create_article(request)
 
 
-@AdminRouter.get("/article")
+@AdminRouter.get("/articles")
 async def list_all_articles(
     controller: Annotated[ArticleController, Inject()],
     filter: ArticleFilterRequest = Depends(ArticleFilterRequest),
@@ -64,7 +64,7 @@ async def create_article_category(
     return await controller.create_article_category(request)
 
 
-@AdminRouter.get("/article/category")
+@AdminRouter.get("/article/categories")
 async def list_all_article_categories(
     controller: Annotated[ArticleController, Inject()],
 ) -> APIResponse[ListArticleCategoriesResponse]:
