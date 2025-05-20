@@ -1,9 +1,9 @@
 from fastapi import APIRouter
 from usal.api.v1.admin_router import AdminRouter
-from usal.api.v1.article_router import ArticleRouter
+from usal.api.v1.user_router import UserRouter
 
 
 routers: list[APIRouter] = [
-    ArticleRouter,
+    UserRouter,
     AdminRouter,
 ]
