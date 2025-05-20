@@ -2,10 +2,10 @@ from enum import Enum
 
 
 class ArticleType(Enum):
-    NEWS = "news"
-    BLOG = "blog"
+    NEWS = "NEWS"
+    BLOG = "BLOG"
 
 
 class ArticleStatus(Enum):
-    ACTIVE = "active"
-    INACTIVE = "inactive"
+    ACTIVE = "ACTIVE"
+    INACTIVE = "INACTIVE"

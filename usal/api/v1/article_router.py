@@ -1,13 +1,17 @@
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from wireup import Inject
 
 from usal.api.schema.request.article_request import (
-    CreateArticleCategoryRequest,
-    CreateArticleRequest,
+    ArticleFilterRequest,
 )
+from usal.api.schema.response.article_response import (
+    ListArticlesResponse,
+    ViewArticleDetailsResponse,
+)
+from usal.controllers.article_controller import ArticleController
 from usal.core.api_response import APIResponse
 
 ArticleRouter = APIRouter(
@@ -18,23 +22,15 @@ ArticleRouter = APIRouter(
 
 @ArticleRouter.get("")
 async def list_articles(
-    filter: CreateArticleRequest,
     controller: Annotated[ArticleController, Inject()],
-) -> APIResponse[MessageResponse]:
-    return await controller.add_article(filter)
-
-
-@ArticleRouter.get("")
-async def list_articles(
-    filter: CreateArticleRequest,
-    controller: Annotated[ArticleController, Inject()],
-) -> APIResponse[MessageResponse]:
-    return await controller.add_article(filter)
+    filter: ArticleFilterRequest = Depends(ArticleFilterRequest),
+) -> APIResponse[ListArticlesResponse]:
+    return await controller.list_user_articles(filter)
 
 
 @ArticleRouter.get("/{id}")
 async def get_article_by_id(
     id: UUID,
     controller: Annotated[ArticleController, Inject()],
-) -> APIResponse[MessageResponse]:
-    return await controller.create_article_category(article_id=id)
+) -> APIResponse[ViewArticleDetailsResponse]:
+    return await controller.get_article_by_id(article_id=id)

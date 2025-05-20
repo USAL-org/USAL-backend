@@ -1,5 +1,6 @@
 from uuid import UUID
 from pydantic import Field
+from usal.api.schema.request.common_request import PaginationRequest
 from usal.core import BaseRequest
 from usal.core.enums.article import ArticleStatus, ArticleType
 
@@ -34,3 +35,14 @@ class CreateArticleCategoryRequest(BaseRequest):
     """
 
     name: str = Field(description="Name of the article category.")
+
+
+class ArticleFilterRequest(PaginationRequest):
+    """
+    Request to filter articles.
+    """
+
+    search: str | None = Field(None, description="Title of the article.")
+    type: ArticleType = Field(
+        description="Type of the article. Can be either 'news' or 'blog'."
+    )
