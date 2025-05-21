@@ -13,9 +13,11 @@ from usal.api.schema.response.article_response import (
 )
 from usal.api.schema.response.qa_response import ListQAResponse
 from usal.api.schema.response.resources_response import ListResourcesResponse
+from usal.api.schema.response.university_response import ListUniversitiesResponse
 from usal.controllers.article_controller import ArticleController
 from usal.controllers.qa_controller import QAController
 from usal.controllers.resources_controller import ResourcesController
+from usal.controllers.university_controller import UniversityController
 from usal.core.api_response import APIResponse
 from usal.core.enums.qa import QAType
 
@@ -54,3 +56,10 @@ async def list_all_resources(
     controller: Annotated[ResourcesController, Inject()],
 ) -> APIResponse[ListResourcesResponse]:
     return await controller.list_all_resources()
+
+
+@UserRouter.get("/universities")
+async def list_all_universities(
+    controller: Annotated[UniversityController, Inject()],
+) -> APIResponse[ListUniversitiesResponse]:
+    return await controller.list_universities()
