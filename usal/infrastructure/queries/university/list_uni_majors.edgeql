@@ -1,0 +1,4 @@
+SELECT Major {
+    id,
+    name,
+}

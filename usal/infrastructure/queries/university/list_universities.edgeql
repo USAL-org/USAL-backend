@@ -1,0 +1,19 @@
+SELECT University {
+    id,
+    name,
+    location,
+    image,
+    state:{
+        id,
+        name,
+    },
+    description,
+    acceptance_rate,
+    annual_fee,
+    student_faculty_ratio,
+    available_majors:{
+        id,
+        name,
+    },
+    admission_requirements,
+}

@@ -1,0 +1,17 @@
+from enum import Enum
+
+
+class QAStatus(Enum):
+    ACTIVE = "ACTIVE"
+    INACTIVE = "INACTIVE"
+
+
+class QAType(Enum):
+    UNIVERSITY = "UNIVERSITY"
+    ACADEMIC = "ACADEMIC"
+    FINANCIAL = "FINANCIAL"
+    PERSONAL = "PERSONAL"
+    GRADUATE = "GRADUATE"
+    POST_GRADUATE = "POST_GRADUATE"
+    PHD = "PHD"
+    FAMILY = "FAMILY"

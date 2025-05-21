@@ -6,7 +6,6 @@ module default {
         required property name -> str;    
         required property location -> str;
         required property image -> str;
-        pp_url -> str;
         application_fee -> bool;
         community_college -> bool;
         required state -> State;
