@@ -1,6 +1,7 @@
 from uuid import UUID
 
-from usal.core import BaseSchema
+from usal.core import BaseSchema, PaginatedSchema
+from usal.core.enums.university import UniversityStatus
 
 
 class UniversityMajorResponse(BaseSchema):
@@ -52,13 +53,41 @@ class GetUniversityResponse(BaseSchema):
     acceptance_rate: str
     annual_fee: str
     student_faculty_ratio: str | None
-    available_majors: ListUniversityMajorsResponse
+    available_majors: list[UniversityMajorResponse]
     admission_requirements: list[str]
 
 
-class ListUniversitiesResponse(BaseSchema):
+class ListUniversitiesResponse(PaginatedSchema):
     """
     Response schema for listing universities.
     """
 
     records: list[GetUniversityResponse]
+
+
+class GetAdminUniversityResponse(BaseSchema):
+    """
+    Response schema for getting university details.
+    """
+
+    id: UUID
+    name: str
+    location: str
+    image: str
+    state: str
+    description: str | None
+    acceptance_rate: str
+    annual_fee: str
+    student_faculty_ratio: str | None
+    available_majors: list[UniversityMajorResponse]
+    admission_requirements: list[str]
+    view_count: int
+    status: UniversityStatus
+
+
+class ListAdminUniversitiesResponse(PaginatedSchema):
+    """
+    Response schema for listing universities.
+    """
+
+    records: list[GetAdminUniversityResponse]

@@ -9,6 +9,7 @@ from usal.api.schema.request.article_request import (
 )
 from usal.api.schema.request.qa_request import QAFilterRequest
 from usal.api.schema.request.resources_request import FilterResourcesRequest
+from usal.api.schema.request.university_request import UniversityFilterRequest
 from usal.api.schema.response.article_response import (
     ListArticlesResponse,
     ViewArticleDetailsResponse,
@@ -63,5 +64,6 @@ async def list_all_resources(
 @UserRouter.get("/universities")
 async def list_all_universities(
     controller: Annotated[UniversityController, Inject()],
+    filter: UniversityFilterRequest = Depends(UniversityFilterRequest),
 ) -> APIResponse[ListUniversitiesResponse]:
-    return await controller.list_universities()
+    return await controller.list_user_universities(filter)

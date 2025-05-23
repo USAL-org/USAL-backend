@@ -4,6 +4,7 @@ from uuid import UUID
 from usal.core.db_repo import DbRepo
 from usal.core.enums.university import UniversityStatus
 from usal.domain.entities.university_entity import (
+    ListAdminUniversitiesEntity,
     ListStatesEntity,
     ListUniversitiesEntity,
     ListUniversityMajorsEntity,
@@ -12,7 +13,10 @@ from usal.domain.entities.university_entity import (
 
 class UniversityRepo(DbRepo):
     @abstractmethod
-    async def list_states(self) -> ListStatesEntity:
+    async def list_states(
+        self,
+        search: str | None = None,
+    ) -> ListStatesEntity:
         """
         List all states.
 
@@ -37,7 +41,10 @@ class UniversityRepo(DbRepo):
         """
 
     @abstractmethod
-    async def list_university_majors(self) -> ListUniversityMajorsEntity:
+    async def list_university_majors(
+        self,
+        search: str | None = None,
+    ) -> ListUniversityMajorsEntity:
         """
         List all university majors.
 
@@ -85,9 +92,46 @@ class UniversityRepo(DbRepo):
         """
 
     @abstractmethod
-    async def list_universities(self) -> ListUniversitiesEntity:
+    async def list_universities(
+        self,
+        page: int,
+        limit: int,
+        search: str | None = None,
+    ) -> ListAdminUniversitiesEntity:
         """
         List all universities.
+
+        Parameters:
+            page (int): Page number for pagination.
+            limit (int): Number of records per page.
+            search (str | None): Search term for filtering universities.
+
+        Returns:
+            ListUniversitiesEntity: List of universities.
+        """
+
+    @abstractmethod
+    async def list_user_universities(
+        self,
+        page: int,
+        limit: int,
+        search: str | None = None,
+        state: UUID | None = None,
+        major: UUID | None = None,
+        application_fee: bool | None = None,
+        community_college: bool | None = None,
+    ) -> ListUniversitiesEntity:
+        """
+        List all universities.
+
+        Parameters:
+            page (int): Page number for pagination.
+            limit (int): Number of records per page.
+            search (str | None): Search term for filtering universities.
+            state (UUID | None): State ID for filtering universities.
+            major (UUID | None): Major ID for filtering universities.
+            application_fee (bool | None): Filter by application fee.
+            community_college (bool | None): Filter by community college status.
 
         Returns:
             ListUniversitiesEntity: List of universities.
