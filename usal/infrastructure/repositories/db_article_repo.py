@@ -6,7 +6,9 @@ from usal.core.exceptions.api_exception import api_exception
 
 from usal.domain.entities.article_entity import (
     ArticleCategoriesEntity,
+    GetAdminArticleEntity,
     GetArticleEntity,
+    ListAdminArticlesEntity,
     ListArticleCategoriesEntity,
     ListArticlesEntity,
     ViewArticleDetailsEntity,
@@ -15,10 +17,14 @@ from usal.domain.repositories.article_repo import ArticleRepo
 from usal.infrastructure.queries.article import (
     create_article_async_edgeql,
     create_article_category_async_edgeql,
+    get_all_articles_count_async_edgeql,
     get_article_by_id_async_edgeql,
+    get_user_articles_count_async_edgeql,
     list_article_categories_async_edgeql,
     list_articles_async_edgeql,
+    list_user_articles_async_edgeql,
 )
+from usal.infrastructure.repositories.pagination_repo import paginate
 
 
 class DbArticleRepo(ArticleRepo):
@@ -54,15 +60,33 @@ class DbArticleRepo(ArticleRepo):
                 )
 
     @override
-    async def list_all_articles(self, type: ArticleType) -> ListArticlesEntity:
+    async def list_all_articles(
+        self,
+        page: int,
+        limit: int,
+        type: ArticleType | None = None,
+        search: str | None = None,
+    ) -> ListAdminArticlesEntity:
         async with self.session() as session:
+            total_count = (
+                await get_all_articles_count_async_edgeql.get_all_articles_count(
+                    session,
+                    search=search,
+                    type=type,
+                )
+            )
+            page_info = await paginate(total_count.total_count, page, limit)
             db_articles = await list_articles_async_edgeql.list_articles(
                 session,
                 type=type,
+                offset=page_info.offset,
+                limit=limit,
+                search=search,
             )
-            return ListArticlesEntity(
+            return ListAdminArticlesEntity(
+                page_info=page_info,
                 records=[
-                    GetArticleEntity.model_validate(article, from_attributes=True)
+                    GetAdminArticleEntity.model_validate(article, from_attributes=True)
                     for article in db_articles
                 ],
             )
@@ -99,13 +123,31 @@ class DbArticleRepo(ArticleRepo):
             )
 
     @override
-    async def list_user_articles(self, type: ArticleType) -> ListArticlesEntity:
+    async def list_user_articles(
+        self,
+        page: int,
+        limit: int,
+        type: ArticleType,
+        search: str | None = None,
+    ) -> ListArticlesEntity:
         async with self.session() as session:
-            db_articles = await list_articles_async_edgeql.list_articles(
+            total_count = (
+                await get_user_articles_count_async_edgeql.get_user_articles_count(
+                    session,
+                    search=search,
+                    type=type,
+                )
+            )
+            page_info = await paginate(total_count.total_count, page, limit)
+            db_articles = await list_user_articles_async_edgeql.list_user_articles(
                 session,
                 type=type,
+                offset=page_info.offset,
+                limit=limit,
+                search=search,
             )
             return ListArticlesEntity(
+                page_info=page_info,
                 records=[
                     GetArticleEntity.model_validate(article, from_attributes=True)
                     for article in db_articles

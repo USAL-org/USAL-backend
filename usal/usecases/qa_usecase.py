@@ -1,6 +1,14 @@
-from usal.api.schema.request.qa_request import CreateQARequest
-from usal.core.enums.qa import QAType
-from usal.domain.entities.qa_entity import ListQAEntity
+from usal.api.schema.request.qa_request import (
+    AdminQAFilterRequest,
+    CreateQARequest,
+    QAFilterRequest,
+)
+from usal.domain.entities.qa_entity import (
+    AdminQAEntity,
+    ListAdminQAEntity,
+    ListQAEntity,
+    QAEntity,
+)
 from usal.domain.repositories.qa_repo import QARepo
 
 
@@ -21,8 +29,38 @@ class QAUsecase:
 
     async def list_all_qa(
         self,
-        type: QAType,
+        filter: AdminQAFilterRequest,
+    ) -> ListAdminQAEntity:
+        qa_obj = await self.repo.list_all_qa(
+            page=filter.page,
+            limit=filter.limit,
+            type=filter.type,
+            question=filter.question,
+        )
+        result = [
+            AdminQAEntity.model_validate(author, from_attributes=True)
+            for author in qa_obj.records
+        ]
+        return ListAdminQAEntity(
+            page_info=qa_obj.page_info,
+            records=result,
+        )
+
+    async def list_user_qa(
+        self,
+        filter: QAFilterRequest,
     ) -> ListQAEntity:
-        return await self.repo.list_qa(
-            type=type,
+        qa_obj = await self.repo.list_user_qa(
+            page=filter.page,
+            limit=filter.limit,
+            type=filter.type,
+            question=filter.question,
+        )
+        result = [
+            QAEntity.model_validate(author, from_attributes=True)
+            for author in qa_obj.records
+        ]
+        return ListQAEntity(
+            page_info=qa_obj.page_info,
+            records=result,
         )

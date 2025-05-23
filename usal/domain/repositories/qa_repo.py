@@ -3,7 +3,7 @@ from abc import abstractmethod
 
 from usal.core.db_repo import DbRepo
 from usal.core.enums.qa import QAStatus, QAType
-from usal.domain.entities.qa_entity import ListQAEntity
+from usal.domain.entities.qa_entity import ListAdminQAEntity, ListQAEntity
 
 
 class QARepo(DbRepo):
@@ -51,13 +51,44 @@ class QARepo(DbRepo):
     #     """
 
     @abstractmethod
-    async def list_qa(self, type: QAType) -> ListQAEntity:
+    async def list_all_qa(
+        self,
+        page: int,
+        limit: int,
+        type: QAType | None = None,
+        question: str | None = None,
+    ) -> ListAdminQAEntity:
         """
-        List question and answers.
+        List all question and answers.
 
         Parameters:
-            type (QAType): Type of the question and answer.
+            page (int): Page number.
+            limit (int): Number of records per page.
+            question (str | None): Question to filter by.
+            type (QAType | None): Type of the question and answer.
 
         Returns:
             ListQAEntity: List of question and answers.
+        """
+
+    @abstractmethod
+    async def list_user_qa(
+        self,
+        page: int,
+        limit: int,
+        type: QAType,
+        question: str | None = None,
+    ) -> ListQAEntity:
+        """
+        List all question and answers.
+
+        Parameters:
+            page (int): Page number.
+            limit (int): Number of records per page.
+            question (str | None): Question to filter by.
+            type (QAType | None): Type of the question and answer.
+            status (QAStatus | None): Status of the question and answer.
+
+        Returns:
+            ListAdminQAEntity: List of question and answers.
         """

@@ -6,6 +6,7 @@ FILTERED_RESOURCES := (
     FILTER (
     (.title ILIKE '%' ++ search ++ '%' IF EXISTS search ELSE TRUE)
     )
+    AND .status = ResourceStatus.ACTIVE
     ORDER BY .title ASC
     OFFSET <optional int64>$offset
     LIMIT <optional int64>$limit
@@ -16,5 +17,4 @@ SELECT FILTERED_RESOURCES {
     image,
     description,
     file,
-    status
 }

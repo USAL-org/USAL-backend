@@ -7,6 +7,8 @@ from wireup import Inject
 from usal.api.schema.request.article_request import (
     ArticleFilterRequest,
 )
+from usal.api.schema.request.qa_request import QAFilterRequest
+from usal.api.schema.request.resources_request import FilterResourcesRequest
 from usal.api.schema.response.article_response import (
     ListArticlesResponse,
     ViewArticleDetailsResponse,
@@ -19,7 +21,6 @@ from usal.controllers.qa_controller import QAController
 from usal.controllers.resources_controller import ResourcesController
 from usal.controllers.university_controller import UniversityController
 from usal.core.api_response import APIResponse
-from usal.core.enums.qa import QAType
 
 UserRouter = APIRouter(
     tags=["User"],
@@ -45,17 +46,18 @@ async def get_article_by_id(
 
 @UserRouter.get("/QAs")
 async def list_all_qa(
-    type: QAType,
     controller: Annotated[QAController, Inject()],
+    filter: QAFilterRequest = Depends(QAFilterRequest),
 ) -> APIResponse[ListQAResponse]:
-    return await controller.list_all_qa(type)
+    return await controller.list_user_qa(filter)
 
 
 @UserRouter.get("/resource")
 async def list_all_resources(
     controller: Annotated[ResourcesController, Inject()],
+    filter: FilterResourcesRequest = Depends(FilterResourcesRequest),
 ) -> APIResponse[ListResourcesResponse]:
-    return await controller.list_all_resources()
+    return await controller.list_user_resources(filter)
 
 
 @UserRouter.get("/universities")

@@ -1,5 +1,6 @@
 from pydantic import EmailStr, Field
 
+from usal.api.schema.request.common_request import PaginationRequest
 from usal.core import BaseRequest
 
 
@@ -33,3 +34,11 @@ class UpdateAuthorRequest(BaseRequest):
     social_links: list[str] | None = Field(
         None, description="List of social links of the author."
     )
+
+
+class FilterAuthorRequest(PaginationRequest):
+    """
+    Request to filter authors.
+    """
+
+    search: str | None = Field(None, description="Name of an author.")

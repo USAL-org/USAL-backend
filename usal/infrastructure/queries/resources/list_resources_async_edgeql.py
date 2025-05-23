@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 import dataclasses
+import enum
 import gel
 import uuid
 
@@ -13,12 +14,14 @@ class NoPydanticValidation:
     def __get_pydantic_core_schema__(cls, _source_type, _handler):
         # Pydantic 2.x
         from pydantic_core.core_schema import any_schema
+
         return any_schema()
 
     @classmethod
     def __get_validators__(cls):
         # Pydantic 1.x
         from pydantic.dataclasses import dataclass as pydantic_dataclass
+
         _ = pydantic_dataclass(cls)
         cls.__pydantic_model__.__get_validators__ = lambda: []
         return []
@@ -31,19 +34,45 @@ class ListResourcesResult(NoPydanticValidation):
     image: str
     description: str
     file: str
+    status: ResourceStatus
+
+
+class ResourceStatus(enum.Enum):
+    ACTIVE = "ACTIVE"
+    INACTIVE = "INACTIVE"
 
 
 async def list_resources(
     executor: gel.AsyncIOExecutor,
+    *,
+    search: str | None = None,
+    offset: int | None = None,
+    limit: int | None = None,
 ) -> list[ListResourcesResult]:
     return await executor.query(
         """\
-        SELECT Resources {
+        WITH
+            search := <optional str>$search,
+
+        FILTERED_RESOURCES := (
+            SELECT Resources
+            FILTER (
+            (.title ILIKE '%' ++ search ++ '%' IF EXISTS search ELSE TRUE)
+            )
+            ORDER BY .title ASC
+            OFFSET <optional int64>$offset
+            LIMIT <optional int64>$limit
+        )
+        SELECT FILTERED_RESOURCES {
             id,
             title,
             image,
             description,
-            file
+            file,
+            status
         }\
         """,
+        search=search,
+        offset=offset,
+        limit=limit,
     )

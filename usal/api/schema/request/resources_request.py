@@ -1,4 +1,5 @@
 from pydantic import Field
+from usal.api.schema.request.common_request import PaginationRequest
 from usal.core import BaseRequest
 from usal.core.enums.resources import ResourceStatus
 
@@ -30,3 +31,19 @@ class UpdateResourcesRequest(BaseRequest):
         None,
         description="Status of the resource. Can be either 'active' or 'inactive'.",
     )
+
+
+class AdminFilterResourcesRequest(PaginationRequest):
+    """
+    Request to filter resources.
+    """
+
+    search: str | None = Field(None, description="Title of the resource.")
+
+
+class FilterResourcesRequest(PaginationRequest):
+    """
+    Request to filter resources.
+    """
+
+    search: str | None = Field(None, description="Title of the resource.")

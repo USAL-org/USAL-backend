@@ -4,6 +4,7 @@ from uuid import UUID
 from usal.core.db_repo import DbRepo
 from usal.core.enums.article import ArticleStatus, ArticleType
 from usal.domain.entities.article_entity import (
+    ListAdminArticlesEntity,
     ListArticleCategoriesEntity,
     ListArticlesEntity,
     ViewArticleDetailsEntity,
@@ -74,12 +75,24 @@ class ArticleRepo(DbRepo):
     #     """
 
     @abstractmethod
-    async def list_all_articles(self, type: ArticleType) -> ListArticlesEntity:
+    async def list_all_articles(
+        self,
+        page: int,
+        limit: int,
+        type: ArticleType | None = None,
+        search: str | None = None,
+    ) -> ListAdminArticlesEntity:
         """
         List all articles.
 
+        Parameters:
+            page (int): Page number for pagination.
+            limit (int): Number of articles per page.
+            type (ArticleType): Type of the article. Can be either 'news' or 'blog'.
+            search (str | None): Title of the article.
+
         Returns:
-            ListArticlesEntity: List of articles.
+            ListAdminArticlesEntity: List of articles.
         """
 
     @abstractmethod
@@ -124,12 +137,24 @@ class ArticleRepo(DbRepo):
         """
 
     @abstractmethod
-    async def list_user_articles(self, type: ArticleType) -> ListArticlesEntity:
+    async def list_user_articles(
+        self,
+        page: int,
+        limit: int,
+        type: ArticleType,
+        search: str | None = None,
+    ) -> ListArticlesEntity:
         """
-        List all articles.
+        List user articles.
+
+        Parameters:
+            page (int): Page number for pagination.
+            limit (int): Number of articles per page.
+            type (ArticleType): Type of the article. Can be either 'news' or 'blog'.
+            search (str | None): Title of the article.
 
         Returns:
-            ListArticlesEntity: List of articles.
+            ListArticlesEntity: List of user articles.
         """
 
     @abstractmethod

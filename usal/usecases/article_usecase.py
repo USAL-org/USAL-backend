@@ -1,11 +1,15 @@
 from uuid import UUID
 
 from usal.api.schema.request.article_request import (
+    AdminArticleFilterRequest,
     ArticleFilterRequest,
     CreateArticleCategoryRequest,
     CreateArticleRequest,
 )
 from usal.domain.entities.article_entity import (
+    GetAdminArticleEntity,
+    GetArticleEntity,
+    ListAdminArticlesEntity,
     ListArticleCategoriesEntity,
     ListArticlesEntity,
     ViewArticleDetailsEntity,
@@ -38,9 +42,22 @@ class ArticleUsecase:
 
     async def list_all_articles(
         self,
-        filter: ArticleFilterRequest,
-    ) -> ListArticlesEntity:
-        return await self.repo.list_all_articles(type=filter.type)
+        filter: AdminArticleFilterRequest,
+    ) -> ListAdminArticlesEntity:
+        articles_obj = await self.repo.list_all_articles(
+            type=filter.type,
+            page=filter.page,
+            limit=filter.limit,
+            search=filter.search,
+        )
+        result = [
+            GetAdminArticleEntity.model_validate(article, from_attributes=True)
+            for article in articles_obj.records
+        ]
+        return ListAdminArticlesEntity(
+            page_info=articles_obj.page_info,
+            records=result,
+        )
 
     async def create_article_category(
         self,
@@ -59,7 +76,20 @@ class ArticleUsecase:
         self,
         filter: ArticleFilterRequest,
     ) -> ListArticlesEntity:
-        return await self.repo.list_user_articles(type=filter.type)
+        article_obj = await self.repo.list_user_articles(
+            type=filter.type,
+            page=filter.page,
+            limit=filter.limit,
+            search=filter.search,
+        )
+        result = [
+            GetArticleEntity.model_validate(article, from_attributes=True)
+            for article in article_obj.records
+        ]
+        return ListArticlesEntity(
+            page_info=article_obj.page_info,
+            records=result,
+        )
 
     async def get_article_by_id(
         self,
