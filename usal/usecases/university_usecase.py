@@ -1,8 +1,13 @@
 from usal.api.schema.request.university_request import (
     AddUniversityMajorRequest,
     AddUniversityRequest,
+    AdminUniversityFilterRequest,
+    UniversityFilterRequest,
 )
 from usal.domain.entities.university_entity import (
+    GetAdminUniversityEntity,
+    GetUniversityEntity,
+    ListAdminUniversitiesEntity,
     ListStatesEntity,
     ListUniversitiesEntity,
     ListUniversityMajorsEntity,
@@ -45,5 +50,46 @@ class UniversityUsecase:
             status=request.status,
         )
 
-    async def list_universities(self) -> ListUniversitiesEntity:
-        return await self.repo.list_universities()
+    async def list_universities(
+        self,
+        filter: AdminUniversityFilterRequest,
+    ) -> ListAdminUniversitiesEntity:
+        uni_obj = await self.repo.list_universities(
+            search=filter.search,
+            page=filter.page,
+            limit=filter.limit,
+        )
+        return ListAdminUniversitiesEntity(
+            page_info=uni_obj.page_info,
+            records=[
+                GetAdminUniversityEntity.model_validate(
+                    university,
+                    from_attributes=True,
+                )
+                for university in uni_obj.records
+            ],
+        )
+
+    async def list_user_universities(
+        self,
+        filter: UniversityFilterRequest,
+    ) -> ListUniversitiesEntity:
+        uni_obj = await self.repo.list_user_universities(
+            search=filter.search,
+            page=filter.page,
+            limit=filter.limit,
+            state=filter.state,
+            major=filter.major,
+            application_fee=filter.application_fee,
+            community_college=filter.community_college,
+        )
+        return ListUniversitiesEntity(
+            page_info=uni_obj.page_info,
+            records=[
+                GetUniversityEntity.model_validate(
+                    university,
+                    from_attributes=True,
+                )
+                for university in uni_obj.records
+            ],
+        )

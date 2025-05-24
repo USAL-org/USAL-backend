@@ -1,5 +1,6 @@
 from uuid import UUID
 from usal.core import BaseEntity
+from usal.domain.entities.common_entity import PageEntity
 
 
 class AuthorSocialLinkEntity(BaseEntity):
@@ -40,4 +41,5 @@ class ListAuthorsEntity(BaseEntity):
     Response to list authors.
     """
 
+    page_info: PageEntity
     records: list[GetAuthorEntity]

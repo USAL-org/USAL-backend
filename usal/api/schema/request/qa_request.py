@@ -1,4 +1,5 @@
 from pydantic import Field
+from usal.api.schema.request.common_request import PaginationRequest
 from usal.core import BaseRequest
 from usal.core.enums.qa import QAStatus, QAType
 
@@ -27,4 +28,22 @@ class UpdateQARequest(BaseRequest):
         None,
         description="Status of the Q&A. Can be either 'active' or 'inactive'.",
     )
+    type: QAType | None = Field(None, description="Type of the Q&A.")
+
+
+class QAFilterRequest(PaginationRequest):
+    """
+    Request to filter Q&As.
+    """
+
+    question: str | None = Field(None, description="Question of the Q&A.")
+    type: QAType = Field(description="Type of the Q&A.")
+
+
+class AdminQAFilterRequest(PaginationRequest):
+    """
+    Request to filter Q&As.
+    """
+
+    question: str | None = Field(None, description="Question of the Q&A.")
     type: QAType | None = Field(None, description="Type of the Q&A.")

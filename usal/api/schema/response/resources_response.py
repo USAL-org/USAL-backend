@@ -1,5 +1,6 @@
 from uuid import UUID
-from usal.core import BaseSchema
+from usal.core import BaseSchema, PaginatedSchema
+from usal.core.enums.resources import ResourceStatus
 
 
 class ResourceResponse(BaseSchema):
@@ -14,9 +15,30 @@ class ResourceResponse(BaseSchema):
     file: str
 
 
-class ListResourcesResponse(BaseSchema):
+class ListResourcesResponse(PaginatedSchema):
     """
     Response to list resources.
     """
 
     records: list[ResourceResponse]
+
+
+class AdminResourceResponse(BaseSchema):
+    """
+    Response to get a resource.
+    """
+
+    id: UUID
+    title: str
+    image: str
+    description: str
+    file: str
+    status: ResourceStatus
+
+
+class ListAdminResourcesResponse(PaginatedSchema):
+    """
+    Response to list resources.
+    """
+
+    records: list[AdminResourceResponse]

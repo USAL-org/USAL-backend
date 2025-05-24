@@ -6,8 +6,10 @@ from usal.domain.entities.author_entity import GetAuthorEntity, ListAuthorsEntit
 from usal.domain.repositories.author_repo import AuthorRepo
 from usal.infrastructure.queries.author import (
     create_author_async_edgeql,
+    get_author_count_async_edgeql,
     list_authors_async_edgeql,
 )
+from usal.infrastructure.repositories.pagination_repo import paginate
 
 
 class DbAuthorRepo(AuthorRepo):
@@ -37,10 +39,26 @@ class DbAuthorRepo(AuthorRepo):
                 )
 
     @override
-    async def list_all_author(self) -> ListAuthorsEntity:
+    async def list_all_author(
+        self,
+        page: int,
+        limit: int,
+        search: str | None = None,
+    ) -> ListAuthorsEntity:
         async with self.session() as session:
-            db_author = await list_authors_async_edgeql.list_authors(session)
+            total_count = await get_author_count_async_edgeql.get_author_count(
+                session,
+                search=search,
+            )
+            page_info = await paginate(total_count.total_count, page, limit)
+            db_author = await list_authors_async_edgeql.list_authors(
+                session,
+                offset=page_info.offset,
+                limit=limit,
+                search=search,
+            )
             return ListAuthorsEntity(
+                page_info=page_info,
                 records=[
                     GetAuthorEntity.model_validate(author, from_attributes=True)
                     for author in db_author

@@ -1,12 +1,15 @@
 from uuid import UUID
 from usal.api.schema.request.article_request import (
+    AdminArticleFilterRequest,
     ArticleFilterRequest,
     CreateArticleCategoryRequest,
     CreateArticleRequest,
 )
 from usal.api.schema.response.article_response import (
     ArticleCategoriesResponse,
+    GetAdminArticleResponse,
     GetArticleResponse,
+    ListAdminArticlesResponse,
     ListArticleCategoriesResponse,
     ListArticlesResponse,
     ViewArticleDetailsResponse,
@@ -34,15 +37,18 @@ class ArticleController:
 
     async def list_all_articles(
         self,
-        filter: ArticleFilterRequest,
-    ) -> APIResponse[ListArticlesResponse]:
+        filter: AdminArticleFilterRequest,
+    ) -> APIResponse[ListAdminArticlesResponse]:
         articles_obj = await self.usecase.list_all_articles(
             filter=filter,
         )
         return api_response(
-            ListArticlesResponse(
+            ListAdminArticlesResponse(
+                **articles_obj.page_info.model_dump(),
                 records=[
-                    GetArticleResponse.model_validate(article, from_attributes=True)
+                    GetAdminArticleResponse.model_validate(
+                        article, from_attributes=True
+                    )
                     for article in articles_obj.records
                 ],
             )
@@ -83,6 +89,7 @@ class ArticleController:
         )
         return api_response(
             ListArticlesResponse(
+                **articles_obj.page_info.model_dump(),
                 records=[
                     GetArticleResponse.model_validate(article, from_attributes=True)
                     for article in articles_obj.records

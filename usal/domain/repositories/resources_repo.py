@@ -3,7 +3,10 @@ from abc import abstractmethod
 
 from usal.core.db_repo import DbRepo
 from usal.core.enums.resources import ResourceStatus
-from usal.domain.entities.resources_entity import ListResourceEntity
+from usal.domain.entities.resources_entity import (
+    ListAdminResourceEntity,
+    ListResourceEntity,
+)
 
 
 class ResourcesRepo(DbRepo):
@@ -56,11 +59,39 @@ class ResourcesRepo(DbRepo):
     #     """
 
     @abstractmethod
-    async def list_resources(
+    async def list_all_resources(
         self,
+        page: int,
+        limit: int,
+        search: str | None = None,
+    ) -> ListAdminResourceEntity:
+        """
+        List resources.
+
+        Parameters:
+            page (int): Page number.
+            limit (int): Number of items per page.
+            search (str | None): Search term.
+            status (ResourceStatus | None): Status of the resource.
+
+        Returns:
+            ListResourceEntity: List of resources.
+        """
+
+    @abstractmethod
+    async def list_user_resources(
+        self,
+        page: int,
+        limit: int,
+        search: str | None = None,
     ) -> ListResourceEntity:
         """
         List resources.
+
+        Parameters:
+            page (int): Page number.
+            limit (int): Number of items per page.
+            search (str | None): Search term.
 
         Returns:
             ListResourceEntity: List of resources.

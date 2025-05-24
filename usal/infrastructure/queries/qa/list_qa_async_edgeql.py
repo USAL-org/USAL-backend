@@ -14,12 +14,14 @@ class NoPydanticValidation:
     def __get_pydantic_core_schema__(cls, _source_type, _handler):
         # Pydantic 2.x
         from pydantic_core.core_schema import any_schema
+
         return any_schema()
 
     @classmethod
     def __get_validators__(cls):
         # Pydantic 1.x
         from pydantic.dataclasses import dataclass as pydantic_dataclass
+
         _ = pydantic_dataclass(cls)
         cls.__pydantic_model__.__get_validators__ = lambda: []
         return []
@@ -30,6 +32,13 @@ class ListQaResult(NoPydanticValidation):
     id: uuid.UUID
     question: str
     answer: str
+    status: QAStatus
+    type: QAType
+
+
+class QAStatus(enum.Enum):
+    ACTIVE = "ACTIVE"
+    INACTIVE = "INACTIVE"
 
 
 class QAType(enum.Enum):
@@ -43,19 +52,51 @@ class QAType(enum.Enum):
     FAMILY = "FAMILY"
 
 
+class QAType02(enum.Enum):
+    UNIVERSITY = "UNIVERSITY"
+    ACADEMIC = "ACADEMIC"
+    FINANCIAL = "FINANCIAL"
+    PERSONAL = "PERSONAL"
+    GRADUATE = "GRADUATE"
+    POST_GRADUATE = "POST_GRADUATE"
+    PHD = "PHD"
+    FAMILY = "FAMILY"
+
+
 async def list_qa(
     executor: gel.AsyncIOExecutor,
     *,
-    type: QAType,
+    question: str | None = None,
+    type: QAType02 | None = None,
+    offset: int | None = None,
+    limit: int | None = None,
 ) -> list[ListQaResult]:
     return await executor.query(
         """\
-        SELECT QASection {
+        WITH
+            question := <optional str>$question,
+            qa_type:= <optional QAType>$type,
+
+        FILTERED_QA := (
+            SELECT QASection
+            FILTER (
+            (.question ILIKE '%' ++ question ++ '%' IF EXISTS question ELSE TRUE)
+            )
+            AND .type = qa_type IF EXISTS qa_type ELSE TRUE
+            ORDER BY .question ASC
+            OFFSET <optional int64>$offset
+            LIMIT <optional int64>$limit
+        )
+        SELECT FILTERED_QA {
             id,
             question,
             answer,
-        }
-        FILTER .type = <QAType>$type\
+            status,
+            type,
+        }\
         """,
+        question=question,
         type=type,
+        offset=offset,
+        limit=limit,
     )

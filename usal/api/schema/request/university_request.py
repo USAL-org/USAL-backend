@@ -1,5 +1,6 @@
 from uuid import UUID
 from pydantic import Field
+from usal.api.schema.request.common_request import PaginationRequest
 from usal.core import BaseRequest
 from usal.core.enums.university import UniversityStatus
 
@@ -86,3 +87,43 @@ class UpdateUniversityMajorRequest(BaseRequest):
     """
 
     name: str | None = Field(None, description="Name of the university major")
+
+
+class MajorAndStateFilterRequest(BaseRequest):
+    """
+    Request model for filtering universities by major and state.
+    """
+
+    search: str | None = Field(
+        None, description="Search term for filtering universities"
+    )
+
+
+class AdminUniversityFilterRequest(PaginationRequest):
+    """
+    Request model for filtering universities in admin panel.
+    """
+
+    search: str | None = Field(
+        None, description="Search term for filtering universities"
+    )
+
+
+class UniversityFilterRequest(PaginationRequest):
+    """
+    Request model for filtering universities.
+    """
+
+    search: str | None = Field(
+        None, description="Search term for filtering universities"
+    )
+    state: UUID | None = Field(
+        None, description="State ID where the university is located"
+    )
+    major: UUID | None = Field(None, description="Major ID for filtering universities")
+    application_fee: bool | None = Field(
+        None, description="Whether to filter universities with an application fee"
+    )
+    community_college: bool | None = Field(
+        None, description="Whether to filter community colleges"
+    )

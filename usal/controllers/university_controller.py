@@ -1,10 +1,15 @@
 from usal.api.schema.request.university_request import (
     AddUniversityMajorRequest,
     AddUniversityRequest,
+    AdminUniversityFilterRequest,
+    MajorAndStateFilterRequest,
+    UniversityFilterRequest,
 )
 from usal.api.schema.response.common_response import MessageResponse
 from usal.api.schema.response.university_response import (
+    GetAdminUniversityResponse,
     GetUniversityResponse,
+    ListAdminUniversitiesResponse,
     ListStatesResponse,
     ListUniversitiesResponse,
     ListUniversityMajorsResponse,
@@ -24,6 +29,7 @@ class UniversityController:
 
     async def list_states(
         self,
+        filter: MajorAndStateFilterRequest,
     ) -> APIResponse[ListStatesResponse]:
         states_obj = await self.usecase.list_states()
         return api_response(
@@ -45,7 +51,7 @@ class UniversityController:
         )
 
     async def list_university_majors(
-        self,
+        self, filter: MajorAndStateFilterRequest
     ) -> APIResponse[ListUniversityMajorsResponse]:
         majors_obj = await self.usecase.list_university_majors()
         return api_response(
@@ -66,10 +72,29 @@ class UniversityController:
 
     async def list_universities(
         self,
+        filter: AdminUniversityFilterRequest,
+    ) -> APIResponse[ListAdminUniversitiesResponse]:
+        universities_obj = await self.usecase.list_universities(filter)
+        return api_response(
+            ListAdminUniversitiesResponse(
+                **universities_obj.page_info.model_dump(),
+                records=[
+                    GetAdminUniversityResponse.model_validate(
+                        university, from_attributes=True
+                    )
+                    for university in universities_obj.records
+                ],
+            )
+        )
+
+    async def list_user_universities(
+        self,
+        filter: UniversityFilterRequest,
     ) -> APIResponse[ListUniversitiesResponse]:
-        universities_obj = await self.usecase.list_universities()
+        universities_obj = await self.usecase.list_user_universities(filter)
         return api_response(
             ListUniversitiesResponse(
+                **universities_obj.page_info.model_dump(),
                 records=[
                     GetUniversityResponse.model_validate(
                         university, from_attributes=True

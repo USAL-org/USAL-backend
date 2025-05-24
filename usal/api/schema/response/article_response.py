@@ -4,7 +4,8 @@ from usal.api.schema.response.author_response import (
     GetAuthorResponse,
     ViewAuthorDetailsResponse,
 )
-from usal.core import BaseSchema
+from usal.core import BaseSchema, PaginatedSchema
+from usal.core.enums.article import ArticleStatus, ArticleType
 
 
 class ArticleCategoriesResponse(BaseSchema):
@@ -51,9 +52,30 @@ class GetArticleResponse(BaseSchema):
     author: GetAuthorResponse
 
 
-class ListArticlesResponse(BaseSchema):
+class ListArticlesResponse(PaginatedSchema):
     """
     Response to list articles.
     """
 
     records: list[GetArticleResponse]
+
+
+class GetAdminArticleResponse(BaseSchema):
+    """
+    Response to get an article.
+    """
+
+    id: UUID
+    title: str
+    cover_image: str
+    author: GetAuthorResponse
+    status: ArticleStatus
+    type: ArticleType
+
+
+class ListAdminArticlesResponse(PaginatedSchema):
+    """
+    Response to list articles.
+    """
+
+    records: list[GetAdminArticleResponse]

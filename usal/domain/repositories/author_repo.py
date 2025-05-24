@@ -59,7 +59,12 @@ class AuthorRepo(DbRepo):
     #     """
 
     @abstractmethod
-    async def list_all_author(self) -> ListAuthorsEntity:
+    async def list_all_author(
+        self,
+        page: int,
+        limit: int,
+        search: str | None = None,
+    ) -> ListAuthorsEntity:
         """
         List all authors.
 
