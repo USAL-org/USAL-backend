@@ -9,3 +9,7 @@ class PageEntity(BaseEntity):
     record_range: list[int]
     current_page: int
     offset: int
+
+
+class TokenEntity(BaseEntity):
+    access_token: str

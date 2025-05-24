@@ -11,6 +11,35 @@ PayloadType: TypeAlias = Any | None
 DecoratedCallable: TypeAlias = Callable[..., Any]
 
 
+class AdminPermissions(Enum):
+    """
+    Enum for admin permissions.
+    """
+
+    ARTICLE_MANAGEMENT = "ARTICLE_MANAGEMENT"
+    UNIVERSITY_MANAGEMENT = "UNIVERSITY_MANAGEMENT"
+    QA_MANAGEMENT = "QA_MANAGEMENT"
+    RESOURCES_MANAGEMENT = "RESOURCES_MANAGEMENT"
+    NOTIFICATION_MANAGEMENT = "NOTIFICATION_MANAGEMENT"
+    USER_MANAGEMENT = "USER_MANAGEMENT"
+    MARKETING_MANAGEMENT = "MARKETING_MANAGEMENT"
+
+
+class Permission:
+    """
+    Represents a permission that grants a user specific operations on a resource.
+    """
+
+    def __init__(
+        self,
+        permission: AdminPermissions,
+    ) -> None:
+        self.permission = permission
+
+    def __repr__(self) -> str:
+        return f"Permission(resource={self.permission})"
+
+
 class AuthorizationError(Exception):
     """Base exception for authorization errors."""
 
@@ -35,6 +64,19 @@ class PermissionDelegate(ABC):
     """Abstract base class for getting user permissions."""
 
     @abstractmethod
+    async def get_permissions(self, user_id: UserIdType) -> list[Permission]:
+        """
+        Get permissions for a user.
+
+        Args:
+            user_id: User identifier
+
+        Returns:
+            List of Permission objects
+        """
+        pass
+
+    @abstractmethod
     async def validate_user(self, user_id: UserIdType) -> bool:
         """
         Validate if the user with the given user_id exists and is authorized.
@@ -46,6 +88,48 @@ class PermissionDelegate(ABC):
             True if the user is valid, False otherwise
         """
         pass
+
+    @abstractmethod
+    async def is_superadmin(self, user_id: UserIdType) -> bool:
+        """
+        Check if the user is a superadmin.
+
+        Args:
+            user_id: User identifier
+
+        Returns:
+            True if the user is a superadmin, False otherwise
+        """
+        pass
+
+
+def check_permissions(
+    granted_permissions: list[Permission],
+    required_permissions: list[AdminPermissions],
+) -> bool:
+    """
+    Check if granted permissions satisfy all the required permissions.
+
+    Args:
+        granted_permissions: List of granted Permission objects
+        required_permissions: List of required AdminPermissions
+
+    Returns:
+        True if all required permissions are granted; False otherwise.
+    """
+    # granted_permission_values = {p.permission for p in granted_permissions}
+    # return all(perm in granted_permission_values for perm in required_permissions)
+    granted_permission_values = {p.permission for p in granted_permissions}
+
+    print("Granted:", granted_permission_values)
+    print("Required:", required_permissions)
+    for perm in required_permissions:
+        print(
+            f"Checking if {perm} in granted_permissions ->",
+            perm in granted_permission_values,
+        )
+
+    return all(perm in granted_permission_values for perm in required_permissions)
 
 
 def extract_user_id(payload: PayloadType, kwargs: dict) -> UserIdType:
@@ -77,9 +161,10 @@ def extract_user_id(payload: PayloadType, kwargs: dict) -> UserIdType:
     )
 
 
-def require_permissions[T: Enum](
+def require_permissions(
+    *required_permissions: AdminPermissions,
     delegate: PermissionDelegate,
-) -> DecoratedCallable:
+) -> Callable[[Callable], Callable]:
     """
     Decorator factory for permission-based access control.
 
@@ -97,6 +182,18 @@ def require_permissions[T: Enum](
         @wraps(func)
         async def wrapper(*args: Any, payload: PayloadType, **kwargs: Any) -> Any:  # noqa: ANN401
             user_id = extract_user_id(payload, kwargs)
+
+            is_superadmin = await delegate.is_superadmin(user_id)
+
+            if is_superadmin:
+                return await func(*args, payload=payload, **kwargs)
+
+            permissions = await delegate.get_permissions(user_id)
+            if not check_permissions(permissions, list(required_permissions)):
+                raise AuthorizationError(
+                    message="Insufficient permissions",
+                    status_code=status.HTTP_403_FORBIDDEN,
+                )
 
             if not await delegate.validate_user(user_id):
                 raise AuthorizationError(
