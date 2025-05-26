@@ -117,12 +117,8 @@ def check_permissions(
     Returns:
         True if all required permissions are granted; False otherwise.
     """
-    # granted_permission_values = {p.permission for p in granted_permissions}
-    # return all(perm in granted_permission_values for perm in required_permissions)
     granted_permission_values = {p.permission for p in granted_permissions}
 
-    print("Granted:", granted_permission_values)
-    print("Required:", required_permissions)
     for perm in required_permissions:
         print(
             f"Checking if {perm} in granted_permissions ->",
