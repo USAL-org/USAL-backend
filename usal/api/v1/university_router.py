@@ -39,6 +39,7 @@ async def list_states(
 
 
 @UniversityRouter.get("/majors")
+@perms(AdminPermissions.UNIVERSITY_MANAGEMENT)
 async def list_university_majors(
     controller: Annotated[UniversityController, Inject()],
     filter: MajorAndStateFilterRequest = Depends(MajorAndStateFilterRequest),
@@ -47,6 +48,7 @@ async def list_university_majors(
 
 
 @UniversityRouter.post("/majors")
+@perms(AdminPermissions.UNIVERSITY_MANAGEMENT)
 async def add_university_major(
     request: AddUniversityMajorRequest,
     controller: Annotated[UniversityController, Inject()],
@@ -55,6 +57,7 @@ async def add_university_major(
 
 
 @UniversityRouter.post("")
+@perms(AdminPermissions.UNIVERSITY_MANAGEMENT)
 async def add_university(
     request: AddUniversityRequest,
     controller: Annotated[UniversityController, Inject()],
@@ -63,6 +66,7 @@ async def add_university(
 
 
 @UniversityRouter.get("")
+@perms(AdminPermissions.UNIVERSITY_MANAGEMENT)
 async def list_all_universities(
     controller: Annotated[UniversityController, Inject()],
     filter: AdminUniversityFilterRequest = Depends(AdminUniversityFilterRequest),

@@ -35,6 +35,8 @@ from usal.controllers.author_controller import AuthorController
 from usal.controllers.qa_controller import QAController
 from usal.controllers.resources_controller import ResourcesController
 from usal.core.api_response import APIResponse
+from usal.core.permission_checker import AdminPermissions
+from usal.util.perms import perms
 
 AdminRouter = APIRouter(
     tags=["Admin"],
@@ -43,6 +45,7 @@ AdminRouter = APIRouter(
 
 
 @AdminRouter.post("/author")
+@perms(AdminPermissions.ARTICLE_MANAGEMENT)
 async def create_author(
     request: CreateAuthorRequest,
     controller: Annotated[AuthorController, Inject()],
@@ -51,6 +54,7 @@ async def create_author(
 
 
 @AdminRouter.get("/authors")
+@perms(AdminPermissions.ARTICLE_MANAGEMENT)
 async def list_all_author(
     controller: Annotated[AuthorController, Inject()],
     filter: FilterAuthorRequest = Depends(FilterAuthorRequest),
@@ -61,6 +65,7 @@ async def list_all_author(
 
 
 @AdminRouter.post("/article/category")
+@perms(AdminPermissions.ARTICLE_MANAGEMENT)
 async def create_article_category(
     request: CreateArticleCategoryRequest,
     controller: Annotated[ArticleController, Inject()],
@@ -69,6 +74,7 @@ async def create_article_category(
 
 
 @AdminRouter.get("/article/categories")
+@perms(AdminPermissions.ARTICLE_MANAGEMENT)
 async def list_all_article_categories(
     controller: Annotated[ArticleController, Inject()],
 ) -> APIResponse[ListArticleCategoriesResponse]:
@@ -76,6 +82,7 @@ async def list_all_article_categories(
 
 
 @AdminRouter.post("/article")
+@perms(AdminPermissions.ARTICLE_MANAGEMENT)
 async def create_article(
     request: CreateArticleRequest,
     controller: Annotated[ArticleController, Inject()],
@@ -84,6 +91,7 @@ async def create_article(
 
 
 @AdminRouter.get("/articles")
+@perms(AdminPermissions.ARTICLE_MANAGEMENT)
 async def list_all_articles(
     controller: Annotated[ArticleController, Inject()],
     filter: AdminArticleFilterRequest = Depends(AdminArticleFilterRequest),
@@ -92,6 +100,7 @@ async def list_all_articles(
 
 
 @AdminRouter.post("/QA")
+@perms(AdminPermissions.QA_MANAGEMENT)
 async def create_QA(
     request: CreateQARequest,
     controller: Annotated[QAController, Inject()],
@@ -100,6 +109,7 @@ async def create_QA(
 
 
 @AdminRouter.get("/QAs")
+@perms(AdminPermissions.QA_MANAGEMENT)
 async def list_all_qa(
     controller: Annotated[QAController, Inject()],
     filter: AdminQAFilterRequest = Depends(AdminQAFilterRequest),
@@ -108,6 +118,7 @@ async def list_all_qa(
 
 
 @AdminRouter.post("/resource")
+@perms(AdminPermissions.RESOURCES_MANAGEMENT)
 async def create_resource(
     request: CreateResourcesRequest,
     controller: Annotated[ResourcesController, Inject()],
@@ -116,6 +127,7 @@ async def create_resource(
 
 
 @AdminRouter.get("/resource")
+@perms(AdminPermissions.RESOURCES_MANAGEMENT)
 async def list_all_resources(
     controller: Annotated[ResourcesController, Inject()],
     filter: AdminFilterResourcesRequest = Depends(AdminFilterResourcesRequest),
