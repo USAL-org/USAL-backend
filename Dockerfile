@@ -49,4 +49,4 @@ FROM runner AS staging
 CMD ["run"]
 
 FROM runner AS local
-CMD ["dev"]
+CMD ["debug"]
