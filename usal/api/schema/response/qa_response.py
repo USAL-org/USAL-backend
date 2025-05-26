@@ -20,7 +20,7 @@ class ListQAResponse(PaginatedSchema):
     records: list[QAResponse]
 
 
-class ViewQAResponse(QAResponse):
+class ViewQAResponse(BaseSchema):
     """
     Response to view a question and answer.
     """

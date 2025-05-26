@@ -21,7 +21,7 @@ class ListQAEntity(BaseEntity):
     records: list[QAEntity]
 
 
-class ViewQAEntity(QAEntity):
+class ViewQAEntity(BaseEntity):
     """
     Entity to represent a view of a question and answer.
     """
