@@ -5,10 +5,23 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "bcrypt>=4.3.0",
     "debugpy>=1.8.8",
     "fastapi[standard]>=0.115.12",
     "gel>=3.1.0",
+    "passlib>=1.7.4",
     "pre-commit>=4.2.0",
     "pydantic>=2.11.4",
+    "pyjwt>=2.10.1",
     "wireup==0.14.0",
 ]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["usal"]

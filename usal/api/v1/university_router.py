@@ -17,6 +17,10 @@ from usal.api.schema.response.university_response import (
 )
 from usal.controllers.university_controller import UniversityController
 from usal.core.api_response import APIResponse
+from usal.core.jwt.jwt_bearer import JWTBearer
+from usal.core.jwt.jwt_payload import JWTPayload
+from usal.core.permission_checker import AdminPermissions
+from usal.util.perms import perms
 
 UniversityRouter = APIRouter(
     tags=["University Management"],
@@ -25,14 +29,17 @@ UniversityRouter = APIRouter(
 
 
 @UniversityRouter.get("/states")
+@perms(AdminPermissions.UNIVERSITY_MANAGEMENT)
 async def list_states(
     controller: Annotated[UniversityController, Inject()],
     filter: MajorAndStateFilterRequest = Depends(MajorAndStateFilterRequest),
+    payload: JWTPayload = Depends(JWTBearer("admin")),
 ) -> APIResponse[ListStatesResponse]:
     return await controller.list_states(filter)
 
 
 @UniversityRouter.get("/majors")
+@perms(AdminPermissions.UNIVERSITY_MANAGEMENT)
 async def list_university_majors(
     controller: Annotated[UniversityController, Inject()],
     filter: MajorAndStateFilterRequest = Depends(MajorAndStateFilterRequest),
@@ -41,6 +48,7 @@ async def list_university_majors(
 
 
 @UniversityRouter.post("/majors")
+@perms(AdminPermissions.UNIVERSITY_MANAGEMENT)
 async def add_university_major(
     request: AddUniversityMajorRequest,
     controller: Annotated[UniversityController, Inject()],
@@ -49,6 +57,7 @@ async def add_university_major(
 
 
 @UniversityRouter.post("")
+@perms(AdminPermissions.UNIVERSITY_MANAGEMENT)
 async def add_university(
     request: AddUniversityRequest,
     controller: Annotated[UniversityController, Inject()],
@@ -57,6 +66,7 @@ async def add_university(
 
 
 @UniversityRouter.get("")
+@perms(AdminPermissions.UNIVERSITY_MANAGEMENT)
 async def list_all_universities(
     controller: Annotated[UniversityController, Inject()],
     filter: AdminUniversityFilterRequest = Depends(AdminUniversityFilterRequest),

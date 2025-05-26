@@ -1,0 +1,8 @@
+module default {
+    scalar type AdminPermissions extending enum<ARTICLE_MANAGEMENT,UNIVERSITY_MANAGEMENT, QA_MANAGEMENT, RESOURCES_MANAGEMENT, NOTIFICATION_MANAGEMENT, USER_MANAGEMENT, MARKETING_MANAGEMENT>;
+
+    type AdminPermission extending DateTime {
+        required multi permission: AdminPermissions;
+        required admin: Admin;
+    }
+}

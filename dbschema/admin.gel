@@ -8,5 +8,8 @@ module default {
         };
         required password_hash -> str;
         pp_url -> str;
+        super_admin -> bool {
+            default := False;
+        }
     }
 }
