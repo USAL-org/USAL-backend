@@ -1,3 +1,4 @@
+from uuid import UUID
 from usal.api.schema.request.qa_request import (
     AdminQAFilterRequest,
     CreateQARequest,
@@ -8,6 +9,7 @@ from usal.api.schema.response.qa_response import (
     ListAdminQAResponse,
     ListQAResponse,
     QAResponse,
+    ViewQAResponse,
 )
 from usal.core.api_response import APIResponse, api_response
 from usal.api.schema.response.common_response import MessageResponse
@@ -55,5 +57,17 @@ class QAController:
                     QAResponse.model_validate(qa, from_attributes=True)
                     for qa in qa_obj.records
                 ],
+            )
+        )
+
+    async def get_qa_by_id(
+        self,
+        qa_id: UUID,
+    ) -> APIResponse[ViewQAResponse]:
+        qa_obj = await self.usecase.get_qa_by_id(qa_id=qa_id)
+        return api_response(
+            ViewQAResponse.model_validate(
+                qa_obj,
+                from_attributes=True,
             )
         )

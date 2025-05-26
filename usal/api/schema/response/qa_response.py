@@ -10,7 +10,6 @@ class QAResponse(BaseSchema):
 
     id: UUID
     question: str
-    answer: str
 
 
 class ListQAResponse(PaginatedSchema):
@@ -19,6 +18,15 @@ class ListQAResponse(PaginatedSchema):
     """
 
     records: list[QAResponse]
+
+
+class ViewQAResponse(QAResponse):
+    """
+    Response to view a question and answer.
+    """
+
+    id: UUID
+    answer: str
 
 
 class AdminQAResponse(BaseSchema):

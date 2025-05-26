@@ -1,9 +1,10 @@
 from abc import abstractmethod
+from uuid import UUID
 # from uuid import UUID
 
 from usal.core.db_repo import DbRepo
 from usal.core.enums.qa import QAStatus, QAType
-from usal.domain.entities.qa_entity import ListAdminQAEntity, ListQAEntity
+from usal.domain.entities.qa_entity import ListAdminQAEntity, ListQAEntity, ViewQAEntity
 
 
 class QARepo(DbRepo):
@@ -91,4 +92,19 @@ class QARepo(DbRepo):
 
         Returns:
             ListAdminQAEntity: List of question and answers.
+        """
+
+    @abstractmethod
+    async def get_qa_by_id(
+        self,
+        qa_id: UUID,
+    ) -> ViewQAEntity:
+        """
+        Get a question and answer by ID.
+
+        Parameters:
+            qa_id (UUID): ID of the question and answer.
+
+        Returns:
+            ViewQAEntity: Question and answer.
         """

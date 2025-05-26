@@ -10,7 +10,6 @@ class QAEntity(BaseEntity):
 
     id: UUID
     question: str
-    answer: str
 
 
 class ListQAEntity(BaseEntity):
@@ -20,6 +19,15 @@ class ListQAEntity(BaseEntity):
 
     page_info: PageEntity
     records: list[QAEntity]
+
+
+class ViewQAEntity(QAEntity):
+    """
+    Entity to represent a view of a question and answer.
+    """
+
+    id: UUID
+    answer: str
 
 
 class AdminQAEntity(BaseEntity):
