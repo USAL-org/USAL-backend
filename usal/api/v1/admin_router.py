@@ -35,6 +35,8 @@ from usal.controllers.author_controller import AuthorController
 from usal.controllers.qa_controller import QAController
 from usal.controllers.resources_controller import ResourcesController
 from usal.core.api_response import APIResponse
+from usal.core.jwt.jwt_bearer import JWTBearer
+from usal.core.jwt.jwt_payload import JWTPayload
 from usal.core.permission_checker import AdminPermissions
 from usal.util.perms import perms
 
@@ -49,6 +51,7 @@ AdminRouter = APIRouter(
 async def create_author(
     request: CreateAuthorRequest,
     controller: Annotated[AuthorController, Inject()],
+    payload: JWTPayload = Depends(JWTBearer("admin")),
 ) -> APIResponse[MessageResponse]:
     return await controller.create_author(request)
 
@@ -58,6 +61,7 @@ async def create_author(
 async def list_all_author(
     controller: Annotated[AuthorController, Inject()],
     filter: FilterAuthorRequest = Depends(FilterAuthorRequest),
+    payload: JWTPayload = Depends(JWTBearer("admin")),
 ) -> APIResponse[ListAuthorsResponse]:
     return await controller.list_all_author(
         filter=filter,
@@ -69,6 +73,7 @@ async def list_all_author(
 async def create_article_category(
     request: CreateArticleCategoryRequest,
     controller: Annotated[ArticleController, Inject()],
+    payload: JWTPayload = Depends(JWTBearer("admin")),
 ) -> APIResponse[MessageResponse]:
     return await controller.create_article_category(request)
 
@@ -77,6 +82,7 @@ async def create_article_category(
 @perms(AdminPermissions.ARTICLE_MANAGEMENT)
 async def list_all_article_categories(
     controller: Annotated[ArticleController, Inject()],
+    payload: JWTPayload = Depends(JWTBearer("admin")),
 ) -> APIResponse[ListArticleCategoriesResponse]:
     return await controller.list_all_article_categories()
 
@@ -86,6 +92,7 @@ async def list_all_article_categories(
 async def create_article(
     request: CreateArticleRequest,
     controller: Annotated[ArticleController, Inject()],
+    payload: JWTPayload = Depends(JWTBearer("admin")),
 ) -> APIResponse[MessageResponse]:
     return await controller.create_article(request)
 
@@ -95,6 +102,7 @@ async def create_article(
 async def list_all_articles(
     controller: Annotated[ArticleController, Inject()],
     filter: AdminArticleFilterRequest = Depends(AdminArticleFilterRequest),
+    payload: JWTPayload = Depends(JWTBearer("admin")),
 ) -> APIResponse[ListAdminArticlesResponse]:
     return await controller.list_all_articles(filter)
 
@@ -104,6 +112,7 @@ async def list_all_articles(
 async def create_QA(
     request: CreateQARequest,
     controller: Annotated[QAController, Inject()],
+    payload: JWTPayload = Depends(JWTBearer("admin")),
 ) -> APIResponse[MessageResponse]:
     return await controller.create_qa(request)
 
@@ -113,6 +122,7 @@ async def create_QA(
 async def list_all_qa(
     controller: Annotated[QAController, Inject()],
     filter: AdminQAFilterRequest = Depends(AdminQAFilterRequest),
+    payload: JWTPayload = Depends(JWTBearer("admin")),
 ) -> APIResponse[ListAdminQAResponse]:
     return await controller.list_all_qa(filter=filter)
 
@@ -122,6 +132,7 @@ async def list_all_qa(
 async def create_resource(
     request: CreateResourcesRequest,
     controller: Annotated[ResourcesController, Inject()],
+    payload: JWTPayload = Depends(JWTBearer("admin")),
 ) -> APIResponse[MessageResponse]:
     return await controller.create_resources(request)
 
@@ -131,5 +142,6 @@ async def create_resource(
 async def list_all_resources(
     controller: Annotated[ResourcesController, Inject()],
     filter: AdminFilterResourcesRequest = Depends(AdminFilterResourcesRequest),
+    payload: JWTPayload = Depends(JWTBearer("admin")),
 ) -> APIResponse[ListAdminResourcesResponse]:
     return await controller.list_all_resources(filter=filter)

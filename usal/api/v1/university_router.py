@@ -43,6 +43,7 @@ async def list_states(
 async def list_university_majors(
     controller: Annotated[UniversityController, Inject()],
     filter: MajorAndStateFilterRequest = Depends(MajorAndStateFilterRequest),
+    payload: JWTPayload = Depends(JWTBearer("admin")),
 ) -> APIResponse[ListUniversityMajorsResponse]:
     return await controller.list_university_majors(filter)
 
@@ -52,6 +53,7 @@ async def list_university_majors(
 async def add_university_major(
     request: AddUniversityMajorRequest,
     controller: Annotated[UniversityController, Inject()],
+    payload: JWTPayload = Depends(JWTBearer("admin")),
 ) -> APIResponse[MessageResponse]:
     return await controller.add_university_major(request)
 
@@ -61,6 +63,7 @@ async def add_university_major(
 async def add_university(
     request: AddUniversityRequest,
     controller: Annotated[UniversityController, Inject()],
+    payload: JWTPayload = Depends(JWTBearer("admin")),
 ) -> APIResponse[MessageResponse]:
     return await controller.add_university(request)
 
@@ -70,5 +73,6 @@ async def add_university(
 async def list_all_universities(
     controller: Annotated[UniversityController, Inject()],
     filter: AdminUniversityFilterRequest = Depends(AdminUniversityFilterRequest),
+    payload: JWTPayload = Depends(JWTBearer("admin")),
 ) -> APIResponse[ListAdminUniversitiesResponse]:
     return await controller.list_universities(filter)
