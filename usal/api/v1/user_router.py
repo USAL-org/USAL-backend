@@ -14,7 +14,7 @@ from usal.api.schema.response.article_response import (
     ListArticlesResponse,
     ViewArticleDetailsResponse,
 )
-from usal.api.schema.response.qa_response import ListQAResponse
+from usal.api.schema.response.qa_response import ListQAResponse, ViewQAResponse
 from usal.api.schema.response.resources_response import ListResourcesResponse
 from usal.api.schema.response.university_response import ListUniversitiesResponse
 from usal.controllers.article_controller import ArticleController
@@ -51,6 +51,14 @@ async def list_all_qa(
     filter: QAFilterRequest = Depends(QAFilterRequest),
 ) -> APIResponse[ListQAResponse]:
     return await controller.list_user_qa(filter)
+
+
+@UserRouter.get("/QA/{id}")
+async def get_qa_by_id(
+    id: UUID,
+    controller: Annotated[QAController, Inject()],
+) -> APIResponse[ViewQAResponse]:
+    return await controller.get_qa_by_id(qa_id=id)
 
 
 @UserRouter.get("/resource")

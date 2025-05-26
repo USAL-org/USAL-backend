@@ -16,5 +16,4 @@ FILTERED_QA := (
 SELECT FILTERED_QA {
     id,
     question,
-    answer,
 }

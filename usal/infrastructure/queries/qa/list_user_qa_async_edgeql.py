@@ -31,7 +31,6 @@ class NoPydanticValidation:
 class ListUserQaResult(NoPydanticValidation):
     id: uuid.UUID
     question: str
-    answer: str
 
 
 class QAType(enum.Enum):
@@ -73,7 +72,6 @@ async def list_user_qa(
         SELECT FILTERED_QA {
             id,
             question,
-            answer,
         }\
         """,
         question=question,

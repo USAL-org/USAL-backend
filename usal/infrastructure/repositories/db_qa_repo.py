@@ -1,4 +1,5 @@
 from typing import override
+from uuid import UUID
 
 from usal.core.enums.qa import QAStatus, QAType
 from usal.core.exceptions.api_exception import api_exception
@@ -7,11 +8,13 @@ from usal.domain.entities.qa_entity import (
     ListAdminQAEntity,
     ListQAEntity,
     QAEntity,
+    ViewQAEntity,
 )
 from usal.domain.repositories.qa_repo import QARepo
 from usal.infrastructure.queries.qa import (
     create_qa_async_edgeql,
     get_all_qa_count_async_edgeql,
+    get_qa_by_id_async_edgeql,
     get_user_qa_count_async_edgeql,
     list_qa_async_edgeql,
     list_user_qa_async_edgeql,
@@ -111,3 +114,16 @@ class DbQARepo(QARepo):
                     QAEntity.model_validate(qa, from_attributes=True) for qa in db_qa
                 ],
             )
+
+    @override
+    async def get_qa_by_id(self, qa_id: UUID) -> ViewQAEntity:
+        async with self.session() as session:
+            db_qa = await get_qa_by_id_async_edgeql.get_qa_by_id(
+                session,
+                qa_id=qa_id,
+            )
+            if not db_qa:
+                raise api_exception(
+                    message="QA not found.",
+                )
+            return ViewQAEntity.model_validate(db_qa, from_attributes=True)

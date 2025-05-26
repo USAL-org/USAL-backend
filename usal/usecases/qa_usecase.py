@@ -1,3 +1,4 @@
+from uuid import UUID
 from usal.api.schema.request.qa_request import (
     AdminQAFilterRequest,
     CreateQARequest,
@@ -8,6 +9,7 @@ from usal.domain.entities.qa_entity import (
     ListAdminQAEntity,
     ListQAEntity,
     QAEntity,
+    ViewQAEntity,
 )
 from usal.domain.repositories.qa_repo import QARepo
 
@@ -64,3 +66,9 @@ class QAUsecase:
             page_info=qa_obj.page_info,
             records=result,
         )
+
+    async def get_qa_by_id(
+        self,
+        qa_id: UUID,
+    ) -> ViewQAEntity:
+        return await self.repo.get_qa_by_id(qa_id=qa_id)
