@@ -102,3 +102,16 @@ class UserController:
     ) -> APIResponse[MessageResponse]:
         await self.usecase.change_password(payload, request)
         return api_response(MessageResponse(message="Password has been changed."))
+
+    async def user_logout(self, payload: JWTPayload) -> APIResponse[MessageResponse]:
+        try:
+            await self.usecase.logout(payload)
+            return api_response(
+                MessageResponse(message="User successfully logged out.")
+            )
+        except Exception as e:
+            raise api_exception(
+                "Failed to log out. Please try again later.",
+                status_code=500,
+                exception=e,
+            )

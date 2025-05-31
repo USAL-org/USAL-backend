@@ -80,6 +80,14 @@ async def resend_otp(
 async def change_password(
     request: ChangePasswordRequest,
     controller: Annotated[UserController, Inject()],
-    payload: JWTPayload = Depends(JWTBearer()),
+    payload: JWTPayload = Depends(JWTBearer("user")),
 ) -> APIResponse[MessageResponse]:
     return await controller.change_password(payload, request)
+
+
+@UserAuthRouter.get("/logout")
+async def user_logout(
+    controller: Annotated[UserController, Inject()],
+    payload: JWTPayload = Depends(JWTBearer("user")),
+) -> APIResponse[MessageResponse]:
+    return await controller.user_logout(payload)

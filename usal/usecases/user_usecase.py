@@ -1,3 +1,4 @@
+from datetime import UTC, datetime
 from uuid import UUID
 
 from fastapi import status
@@ -8,6 +9,7 @@ from usal.api.schema.request.user_request import (
 from usal.core.exceptions.api_exception import api_exception
 from usal.core.jwt.jwt_bearer import create_token
 from usal.core.jwt.jwt_payload import JWTPayload
+from usal.core.token_blacklist import add_token_to_blacklist
 from usal.domain.entities.common_entity import TokenEntity
 from usal.domain.entities.user_entity import (
     OTPReSentEntity,
@@ -163,6 +165,25 @@ class UserUsecase:
         except Exception as e:
             raise api_exception(
                 "Unable to resend otp.",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                exception=e,
+            )
+
+    async def logout(self, payload: JWTPayload) -> None:
+        try:
+            token = payload.credentials
+            print(f"Logging out user with token: {token}\n\n\n\n{payload}")
+            if not token:
+                raise api_exception("Invalid token", status.HTTP_400_BAD_REQUEST)
+
+            remaining = int((payload.exp - datetime.now(UTC)).total_seconds())
+            if remaining > 0:
+                add_token_to_blacklist(token, remaining)
+
+            return None
+        except Exception as e:
+            raise api_exception(
+                "Failed to log out. Please try again later.",
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 exception=e,
             )
