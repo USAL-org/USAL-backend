@@ -22,6 +22,8 @@ from usal.controllers.qa_controller import QAController
 from usal.controllers.resources_controller import ResourcesController
 from usal.controllers.university_controller import UniversityController
 from usal.core.api_response import APIResponse
+from usal.core.jwt.jwt_bearer import JWTBearer
+from usal.core.jwt.jwt_payload import JWTPayload
 
 UserRouter = APIRouter(
     tags=["User"],
@@ -57,6 +59,7 @@ async def list_all_qa(
 async def get_qa_by_id(
     id: UUID,
     controller: Annotated[QAController, Inject()],
+    payload: JWTPayload = Depends(JWTBearer("user")),
 ) -> APIResponse[ViewQAResponse]:
     return await controller.get_qa_by_id(qa_id=id)
 

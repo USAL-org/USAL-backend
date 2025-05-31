@@ -1,3 +1,9 @@
 application:
   app_name: USAL
   app_version: 1.0.0
+
+email:
+  password: mnwbuiiysbszxsii
+  username: lggaminghub12345@gmail.com
+  port: 587
+  host: smtp.gmail.com

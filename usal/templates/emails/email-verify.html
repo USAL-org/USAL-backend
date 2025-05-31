@@ -1,0 +1,31 @@
+{% extends "base-template.html" %} {% block content %}
+
+<div
+    style="
+        font-family: &quot;Segoe UI&quot;, Tahoma, Geneva, Verdana, sans-serif;
+        color: #333;
+        line-height: 1.6;
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 30px;
+    "
+>
+    <p style="font-size: 18px; font-weight: bold; margin-bottom: 20px">
+        Dear {{ name }},
+    </p>
+
+    <p style="font-size: 16px; margin-bottom: 20px">
+    
+        Your verification OTP is:
+        <strong style="font-size: 22px; color: #006400">{{ otp }}</strong>
+    </p>
+
+    <p style="font-size: 14px; color: #555; margin-bottom: 20px">
+        <strong style="color: #FF0000">This OTP will be valid until next 5 minutes only.</strong>
+    </p>
+    <p style="font-size: 18px; font-weight: bold">
+        Thank You.
+    </p>
+</div>
+
+{% endblock %}
