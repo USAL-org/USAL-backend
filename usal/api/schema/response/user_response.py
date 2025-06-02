@@ -31,7 +31,6 @@ class GetUserSchema(BaseSchema):
     full_name: str
     email: str
     phone_number: str
-    password_hash: str
     gender: Gender | None
     verified: bool
     pp_url: str | None
