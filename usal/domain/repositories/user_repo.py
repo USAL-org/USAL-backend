@@ -2,7 +2,7 @@ from abc import abstractmethod
 from uuid import UUID
 
 from usal.core.db_repo import DbRepo
-from usal.domain.entities.user_entity import VerifyUserEntity
+from usal.domain.entities.user_entity import GetUserEntity, VerifyUserEntity
 
 
 class UserRepo(DbRepo):
@@ -67,4 +67,36 @@ class UserRepo(DbRepo):
 
         Args:
             user_id (str): The unique user identifier to mark as verified.
+        """
+
+    @abstractmethod
+    async def update_password(
+        self,
+        user_id: UUID,
+        new_password: str,
+    ) -> None:
+        """
+        Update a user's password.
+
+        Parameters:
+            user_id (UUID): The unique identifier of the user.
+            new_password (str): The new password to set for the user.
+
+        Returns:
+            None
+        """
+
+    @abstractmethod
+    async def get_user_by_id(
+        self,
+        user_id: UUID,
+    ) -> GetUserEntity:
+        """
+        Get a user by their unique identifier.
+
+        Parameters:
+            user_id (UUID): The unique identifier of the user.
+
+        Returns:
+            GetUserEntity: The user entity if found, otherwise raises an exception.
         """

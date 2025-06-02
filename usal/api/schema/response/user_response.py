@@ -1,5 +1,7 @@
+from datetime import datetime
 from uuid import UUID
 from usal.core import BaseSchema
+from usal.core.enums.user import Gender
 
 
 class OTPSentResponse(BaseSchema):
@@ -20,3 +22,17 @@ class OTPVerificationTokenResponse(BaseSchema):
 
     message: str
     token: str | None
+
+
+class GetUserSchema(BaseSchema):
+    """Schema for user details."""
+
+    id: UUID
+    full_name: str
+    email: str
+    phone_number: str
+    password_hash: str
+    gender: Gender | None
+    verified: bool
+    pp_url: str | None
+    date_of_birth: datetime | None

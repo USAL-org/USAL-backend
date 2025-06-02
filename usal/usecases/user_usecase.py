@@ -12,6 +12,7 @@ from usal.core.jwt.jwt_payload import JWTPayload
 from usal.core.token_blacklist import add_token_to_blacklist
 from usal.domain.entities.common_entity import TokenEntity
 from usal.domain.entities.user_entity import (
+    GetUserEntity,
     OTPReSentEntity,
     OTPSentEntity,
     VerificationTokenEntity,
@@ -45,7 +46,6 @@ class UserUsecase:
                     name=user.full_name,
                     email=user.email,
                 )
-                print("$$$$$$$$$$$$$$", otp)
                 return OTPSentEntity(verification_id=otp.id, destination=user.email)
 
         except Exception as e:
@@ -116,9 +116,7 @@ class UserUsecase:
 
     async def change_forgotten_password(self, user_id: UUID, new_password: str) -> None:
         try:
-            await self.auth_repo.update_password(
-                user_id=user_id, new_password=new_password
-            )
+            await self.repo.update_password(user_id=user_id, new_password=new_password)
 
         except Exception as e:
             raise api_exception(
@@ -131,14 +129,14 @@ class UserUsecase:
         self, payload: JWTPayload, request: ChangePasswordRequest
     ) -> None:
         try:
-            user = await self.auth_repo.get_user_login_by_id(payload.user_id)
-            if not verify_password(request.old_password, user.password):
+            user = await self.repo.get_user_by_id(payload.user_id)
+            if not verify_password(request.old_password, user.password_hash):
                 raise api_exception(
                     message="The old password is incorrect.",
                     tag="old_password",
                 )
 
-            await self.auth_repo.update_password(
+            await self.repo.update_password(
                 user_id=user.id, new_password=request.new_password
             )
 
@@ -152,13 +150,12 @@ class UserUsecase:
     async def resend_otp(self, verification_id: UUID) -> OTPReSentEntity:
         try:
             otp = await self.otp_repo.get_otp(verification_id)
-            user = await self.auth_repo.get_by_id(otp.user_id)
-            email = await self.repo.get_by_email(otp, user)
+            user = await self.repo.get_user_by_id(otp.user_id)
 
             new_otp = await self.otp_repo.save_and_send(
                 name=user.full_name,
                 user_id=otp.user_id,
-                email=email,
+                email=user.email,
             )
             return OTPReSentEntity(verification_id=new_otp.id)
 
@@ -187,3 +184,14 @@ class UserUsecase:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 exception=e,
             )
+
+    async def get_user_by_id(self, payload: JWTPayload) -> GetUserEntity:
+        try:
+            user = await self.repo.get_user_by_id(payload.user_id)
+            return GetUserEntity.model_validate(user, from_attributes=True)
+        except Exception as e:
+            raise api_exception(
+                "Failed to retrieve user information.",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                exception=e,
+            ) from e

@@ -12,6 +12,7 @@ from usal.api.schema.response.common_response import (
     TokenResponse,
 )
 from usal.api.schema.response.user_response import (
+    GetUserSchema,
     OTPSentResponse,
     OTPVerificationTokenResponse,
     ResendOTPSentResponse,
@@ -112,6 +113,19 @@ class UserController:
         except Exception as e:
             raise api_exception(
                 "Failed to log out. Please try again later.",
+                status_code=500,
+                exception=e,
+            )
+
+    async def get_user_by_id(self, payload: JWTPayload) -> APIResponse[GetUserSchema]:
+        try:
+            user = await self.usecase.get_user_by_id(payload)
+            return api_response(
+                GetUserSchema.model_validate(user, from_attributes=True)
+            )
+        except Exception as e:
+            raise api_exception(
+                "Failed to retrieve user information.",
                 status_code=500,
                 exception=e,
             )

@@ -14,6 +14,7 @@ from usal.api.schema.request.user_request import (
 )
 from usal.api.schema.response.common_response import MessageResponse, TokenResponse
 from usal.api.schema.response.user_response import (
+    GetUserSchema,
     OTPSentResponse,
     OTPVerificationTokenResponse,
     ResendOTPSentResponse,
@@ -91,3 +92,11 @@ async def user_logout(
     payload: JWTPayload = Depends(JWTBearer("user")),
 ) -> APIResponse[MessageResponse]:
     return await controller.user_logout(payload)
+
+
+@UserAuthRouter.get("/me")
+async def get_user_info(
+    controller: Annotated[UserController, Inject()],
+    payload: JWTPayload = Depends(JWTBearer("user")),
+) -> APIResponse[GetUserSchema]:
+    return await controller.get_user_by_id(payload)
