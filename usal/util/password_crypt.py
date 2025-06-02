@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta, timezone
+from uuid import UUID
 from passlib.context import CryptContext
 
 import jwt
@@ -14,6 +16,13 @@ def get_hashed_password(password: str) -> str:
 
 def verify_password(password: str, hashed_pass: str) -> bool:
     return password_context.verify(password, hashed_pass)
+
+
+async def create_reset_token(user_id: UUID, expires_in: int = 3600) -> str:
+    exp = datetime.now(timezone.utc) + timedelta(seconds=expires_in)
+    payload: dict[str, Any] = {"sub": str(user_id), "exp": exp}
+    token: str = jwt.encode(payload, USER_JWT_SECRET_KEY, algorithm=ALGORITHM)  # type: ignore
+    return token
 
 
 async def decode_token(token: str) -> dict[str, Any]:

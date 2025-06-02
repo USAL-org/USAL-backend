@@ -79,16 +79,11 @@ class UserController:
     async def change_forgotten_password(
         self, password_input: ChangeForgottenPasswordRequest
     ) -> APIResponse[MessageResponse]:
-        try:
-            payload = await decode_token(password_input.token)
-            await self.usecase.change_forgotten_password(
-                user_id=UUID(payload["sub"]), new_password=password_input.password
-            )
-            return api_response(MessageResponse(message="Password has been changed."))
-        except Exception as e:
-            raise api_exception(
-                "Invalid or expired token. Please initiate the password reset process again."
-            ) from e
+        payload = await decode_token(password_input.token)
+        await self.usecase.change_forgotten_password(
+            user_id=UUID(payload["sub"]), new_password=password_input.password
+        )
+        return api_response(MessageResponse(message="Password has been changed."))
 
     async def resend_otp(
         self, verification_id: UUID
