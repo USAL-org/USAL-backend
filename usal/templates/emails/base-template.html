@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Email Template - USAL</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f5f7fa;
+      color: #333;
+    }
+
+    .email-container {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #ffffff;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .header {
+      text-align: center;
+      padding: 24px;
+      background: linear-gradient(90deg, #3c3b6e, #dc143c); /* Blue to Crimson */
+      color: white;
+    }
+
+    .header img {
+      max-width: 100px;
+      border-radius: 50%;
+      margin-bottom: 10px;
+    }
+
+    .header h1 {
+      font-size: 28px;
+      margin: 10px 0 5px;
+    }
+
+    .header p.description {
+      font-size: 14px;
+      max-width: 450px;
+      margin: 0 auto;
+      color: #f0f0f0;
+      line-height: 1.4;
+    }
+
+    .content {
+      padding: 24px;
+	  background: linear-gradient(90deg, #f5f8ff, #fff5f5);
+      line-height: 1.6;
+      color: #444;
+    }
+
+    .footer-section {
+      background: linear-gradient(90deg, #3c3b6e, #dc143c);
+      color: white;
+      padding: 24px 18px;
+      text-align: center;
+    }
+
+    .social-icons {
+      margin-bottom: 15px;
+    }
+
+    .social-icons a {
+      margin: 0 6px;
+      display: inline-block;
+      transition: transform 0.2s ease;
+    }
+
+    .social-icons a:hover {
+      transform: scale(1.1);
+    }
+
+    .logo {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background-color: white;
+      padding: 2px;
+    }
+
+    .contact-info {
+      font-size: 14px;
+      line-height: 1.5;
+      margin-top: 12px;
+      color: #f0f0f0;
+    }
+
+    .contact-info p {
+      margin: 2px 0;
+    }
+
+    .copyright {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #dcdcdc;
+    }
+  </style>
+</head>
+<body>
+<div class="email-container">
+  <div class="header">
+    <img src="https://scontent.fktm7-1.fna.fbcdn.net/v/t39.30808-6/459397574_122106568652515528_4205019662998963322_n.jpg?_nc_cat=109&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=Uy079j0D7eoQ7kNvwHTJrtr&_nc_oc=Adneme0ssXP0q7kFvTNZR2O7zIBbXnleA-P90PcIfgsNkW5DPzZtLwilyveMx3USK7c&_nc_zt=23&_nc_ht=scontent.fktm7-1.fna&_nc_gid=YDVtF0hjL1rlw8mc2Lqp2w&oh=00_AfJDop215VoZT_xhw8tjgjAmcqpJXaJIQ4PtOSy59-3Nfw&oe=68407D24" alt="USAL Logo" />
+    <h1>USA Self Learn</h1>
+    <p class="description">
+      We empower students with the guidance, tools, and resources they need to study abroad focusing on opportunities in the USA and beyond.
+    </p>
+  </div>
+
+  <div class="content">
+    {% block content %}{% endblock %}
+  </div>
+
+  <div class="footer-section">
+    <div class="social-icons">
+      <a href="https://www.linkedin.com/company/usal" target="_blank">
+        <img class="logo" src="https://cdn-icons-png.flaticon.com/512/174/174857.png" alt="LinkedIn" />
+      </a>
+      <!--<a href="https://twitter.com/usal_tech" target="_blank">
+        <img class="logo" src="https://cdn-icons-png.flaticon.com/512/733/733579.png" alt="Twitter" />
+      </a> -->
+      <a href="mailto:usal@gmail.com" target="_blank">
+        <img class="logo" src="https://cdn-icons-png.flaticon.com/512/732/732200.png" alt="Gmail" />
+      </a>
+      <a href="https://www.facebook.com/groups/407151185598666" target="_blank">
+        <img class="logo" src="https://cdn-icons-png.flaticon.com/512/733/733547.png" alt="Facebook" />
+      </a>
+      <a href="https://t.me/usaltech" target="_blank">
+        <img class="logo" src="https://cdn-icons-png.flaticon.com/512/2111/2111646.png" alt="Telegram" />
+      </a>
+      <a href="https://www.youtube.com/@Usaselfapply" target="_blank">
+        <img class="logo" src="https://cdn-icons-png.flaticon.com/512/1384/1384060.png" alt="YouTube" />
+      </a>
+    </div>
+
+    <div class="contact-info">
+      <p>📍 Kathmandu, Nepal | 📞 +977-9800000000</p>
+    </div>
+
+    <div class="copyright">
+      © 2025 USAL. All rights reserved.
+    </div>
+  </div>
+</div>
+</body>
+</html>

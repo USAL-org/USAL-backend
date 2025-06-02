@@ -7,6 +7,7 @@ from fastapi.security import HTTPBearer
 
 from usal.core.exceptions.api_exception import api_exception
 from usal.core.jwt.jwt_payload import JWTPayload
+from usal.core.token_blacklist import is_token_blacklisted
 
 USER_ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 15
 ADMIN_ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7
@@ -78,6 +79,9 @@ class JWTBearer(HTTPBearer):
         else:
             raise api_exception("Unknown token prefix", status.HTTP_403_FORBIDDEN)
 
+        if is_token_blacklisted(token):
+            raise api_exception("Token has been revoked", status.HTTP_403_FORBIDDEN)
+
         try:
             payload = jwt.decode(token, secret, algorithms=[ALGORITHM])
         except jwt.ExpiredSignatureError:
@@ -92,7 +96,9 @@ class JWTBearer(HTTPBearer):
             )
 
         try:
-            return JWTPayload(**payload)
+            jwt_payload = JWTPayload(**payload)
+            jwt_payload.credentials = token
+            return jwt_payload
         except Exception as e:
             raise api_exception(
                 f"Invalid token payload: {str(e)}", status.HTTP_403_FORBIDDEN
