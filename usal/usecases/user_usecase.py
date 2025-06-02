@@ -19,7 +19,11 @@ from usal.domain.entities.user_entity import (
 )
 from usal.domain.repositories.otp_repo import OTPRepo
 from usal.domain.repositories.user_repo import UserRepo
-from usal.util.password_crypt import get_hashed_password, verify_password
+from usal.util.password_crypt import (
+    create_reset_token,
+    get_hashed_password,
+    verify_password,
+)
 
 
 class UserUsecase:
@@ -89,8 +93,9 @@ class UserUsecase:
                 verification_id,
                 secret,
             )
-            return await self.repo.verify_user(otp.user_id)
-
+            await self.repo.verify_user(otp.user_id)
+            token = await create_reset_token(user_id=otp.user_id)
+            return VerificationTokenEntity(token=token)
         except Exception as e:
             raise api_exception(
                 "The user verification has failed.",
@@ -116,7 +121,10 @@ class UserUsecase:
 
     async def change_forgotten_password(self, user_id: UUID, new_password: str) -> None:
         try:
-            await self.repo.update_password(user_id=user_id, new_password=new_password)
+            await self.repo.update_password(
+                user_id=user_id,
+                new_password=get_hashed_password(new_password),
+            )
 
         except Exception as e:
             raise api_exception(
@@ -128,24 +136,18 @@ class UserUsecase:
     async def change_password(
         self, payload: JWTPayload, request: ChangePasswordRequest
     ) -> None:
-        try:
-            user = await self.repo.get_user_by_id(payload.user_id)
-            if not verify_password(request.old_password, user.password_hash):
-                raise api_exception(
-                    message="The old password is incorrect.",
-                    tag="old_password",
-                )
-
-            await self.repo.update_password(
-                user_id=user.id, new_password=request.new_password
-            )
-
-        except Exception as e:
+        user = await self.repo.get_user_by_id(payload.user_id)
+        if not verify_password(request.old_password, user.password_hash):
             raise api_exception(
-                "Unable to change password.",
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                exception=e,
+                message="The old password is incorrect.",
+                tag="old_password",
             )
+
+        await self.repo.update_password(
+            user_id=user.id,
+            new_password=get_hashed_password(request.new_password),
+        )
+        await self.logout(payload)
 
     async def resend_otp(self, verification_id: UUID) -> OTPReSentEntity:
         try:
