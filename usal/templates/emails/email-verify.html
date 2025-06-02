@@ -1,30 +1,39 @@
 {% extends "base-template.html" %} {% block content %}
 
 <div
+
     style="
-        font-family: &quot;Segoe UI&quot;, Tahoma, Geneva, Verdana, sans-serif;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         color: #333;
-        line-height: 1.6;
+        background: linear-gradient(90deg, #f5f8ff, #fff5f5);
+        padding: 30px;
         max-width: 600px;
         margin: 0 auto;
-        padding: 30px;
+        line-height: 1.6;
+        border-top: 1px solid #eee;
+        border-bottom: 1px solid #eee;
+        border-radius: 4px;
     "
+
 >
-    <p style="font-size: 18px; font-weight: bold; margin-bottom: 20px">
-        Dear {{ name }},
+    <p style="font-size: 18px; margin-bottom: 20px;">
+        Hey <strong style="font-size: 20px; color: #0a4d8c;">{{ name }},</strong>
     </p>
 
-    <p style="font-size: 16px; margin-bottom: 20px">
+    <p style="font-size: 16px; margin-bottom: 20px;">
+        Your one time password (OTP) for <strong style="color: #c8102e;">USA Self Learn</strong> is:
+        <strong style="font-size: 21px; color: #0a4d8c;">{{ otp }}</strong>
+    </p>
+
+    <p style="font-size: 14px; color: #555; margin-bottom: 20px;">
+        <strong style="color: #d62828;">
+            This OTP is valid for 5 minutes only. Please do not share it with anyone.
+        </strong>
+    </p>
     
-        Your verification OTP is:
-        <strong style="font-size: 22px; color: #006400">{{ otp }}</strong>
-    </p>
-
-    <p style="font-size: 14px; color: #555; margin-bottom: 20px">
-        <strong style="color: #FF0000">This OTP will be valid until next 5 minutes only.</strong>
-    </p>
-    <p style="font-size: 18px; font-weight: bold">
-        Thank You.
+    <p style="font-size: 17px; font-weight: bold; color: #333;">
+        Thank You,<br />
+        <span style="color: #0a4d8c;">USAL Team</span>
     </p>
 </div>
 
