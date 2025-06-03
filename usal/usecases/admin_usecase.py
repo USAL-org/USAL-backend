@@ -32,5 +32,5 @@ class AdminUsecase:
             )
 
         return TokenEntity(
-            access_token=create_token(subject_id=admin.id, token_type="user"),
+            access_token=create_token(subject_id=admin.id, token_type="admin"),
         )
