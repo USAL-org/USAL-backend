@@ -9,7 +9,7 @@ class UserSignUpRequest(BaseRequest):
 
     full_name: str = Field(..., description="User's full name (required).")
     email: EmailStr = Field(..., description="User's email (required).")
-    phone_number: str = Field(..., description="User's phone number (required).")
+    # phone_number: str = Field(..., description="User's phone number (required).")
     password: str = Field(description="User's password (required).")
     confirm_password: str = Field(
         description="Confirmation of the user's password (required)."

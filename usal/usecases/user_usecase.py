@@ -41,7 +41,7 @@ class UserUsecase:
             user = await self.repo.user_create(
                 full_name=request.full_name,
                 email=request.email,
-                phone_number=request.phone_number,
+                phone_number="9876543210",
                 password=get_hashed_password(request.password),
             )
             if user:
