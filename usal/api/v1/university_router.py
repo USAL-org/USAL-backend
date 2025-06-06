@@ -33,7 +33,6 @@ UniversityRouter = APIRouter(
 async def list_states(
     controller: Annotated[UniversityController, Inject()],
     filter: MajorAndStateFilterRequest = Depends(MajorAndStateFilterRequest),
-    payload: JWTPayload = Depends(JWTBearer("admin")),
 ) -> APIResponse[ListStatesResponse]:
     return await controller.list_states(filter)
 
@@ -43,7 +42,6 @@ async def list_states(
 async def list_university_majors(
     controller: Annotated[UniversityController, Inject()],
     filter: MajorAndStateFilterRequest = Depends(MajorAndStateFilterRequest),
-    payload: JWTPayload = Depends(JWTBearer("admin")),
 ) -> APIResponse[ListUniversityMajorsResponse]:
     return await controller.list_university_majors(filter)
 
