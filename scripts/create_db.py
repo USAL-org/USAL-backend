@@ -204,6 +204,8 @@ async def main() -> None:
     try:
         await configure_system(client)
         await create_super_admin(client)
+        await validate_and_update_default_data(client)
+
     except Exception as e:
         print(f"An error occurred: {e}")
     finally:

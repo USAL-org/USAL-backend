@@ -24,7 +24,7 @@ DEFAULT_DATA_DICT: DefaultDataMapping = {
         (
             "State",
             StateRequest,
-            "administrative_divisions",
+            "usa_states",
         ),
     ],
 }
