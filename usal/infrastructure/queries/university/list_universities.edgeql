@@ -1,4 +1,16 @@
-SELECT University {
+WITH
+    search := <optional str>$search,
+
+FILTERED_UNIVERSITY := (
+    SELECT University
+    FILTER (
+    (.name ILIKE '%' ++ search ++ '%' IF EXISTS search ELSE TRUE)
+    )
+    ORDER BY .name ASC
+    OFFSET <optional int64>$offset
+    LIMIT <optional int64>$limit
+)
+SELECT FILTERED_UNIVERSITY {
     id,
     name,
     location,
@@ -16,4 +28,6 @@ SELECT University {
         name,
     },
     admission_requirements,
+    status,
+    view_count,
 }

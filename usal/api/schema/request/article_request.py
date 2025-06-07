@@ -37,6 +37,17 @@ class CreateArticleCategoryRequest(BaseRequest):
     name: str = Field(description="Name of the article category.")
 
 
+class AdminArticleFilterRequest(PaginationRequest):
+    """
+    Request to filter articles.
+    """
+
+    search: str | None = Field(None, description="Title of the article.")
+    type: ArticleType | None = Field(
+        None, description="Type of the article. Can be either 'news' or 'blog'."
+    )
+
+
 class ArticleFilterRequest(PaginationRequest):
     """
     Request to filter articles.

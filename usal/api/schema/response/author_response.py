@@ -1,5 +1,5 @@
 from uuid import UUID
-from usal.core import BaseSchema
+from usal.core import BaseSchema, PaginatedSchema
 
 
 class AuthorSocialLink(BaseSchema):
@@ -35,7 +35,7 @@ class GetAuthorResponse(BaseSchema):
     pp_url: str | None
 
 
-class ListAuthorsResponse(BaseSchema):
+class ListAuthorsResponse(PaginatedSchema):
     """
     Response to list authors.
     """

@@ -13,12 +13,14 @@ class NoPydanticValidation:
     def __get_pydantic_core_schema__(cls, _source_type, _handler):
         # Pydantic 2.x
         from pydantic_core.core_schema import any_schema
+
         return any_schema()
 
     @classmethod
     def __get_validators__(cls):
         # Pydantic 1.x
         from pydantic.dataclasses import dataclass as pydantic_dataclass
+
         _ = pydantic_dataclass(cls)
         cls.__pydantic_model__.__get_validators__ = lambda: []
         return []
@@ -33,13 +35,32 @@ class ListAuthorsResult(NoPydanticValidation):
 
 async def list_authors(
     executor: gel.AsyncIOExecutor,
+    *,
+    search: str | None = None,
+    offset: int | None = None,
+    limit: int | None = None,
 ) -> list[ListAuthorsResult]:
     return await executor.query(
         """\
-        SELECT Author {
+        WITH
+            search := <optional str>$search,
+
+        FILTERED_AUTHOR := (
+            SELECT Author
+            FILTER (
+            (.full_name ILIKE '%' ++ search ++ '%' IF EXISTS search ELSE TRUE)
+            )
+            ORDER BY .full_name ASC
+            OFFSET <optional int64>$offset
+            LIMIT <optional int64>$limit
+        )
+        SELECT FILTERED_AUTHOR {
             id,
             full_name,
             pp_url
         }\
         """,
+        search=search,
+        offset=offset,
+        limit=limit,
     )

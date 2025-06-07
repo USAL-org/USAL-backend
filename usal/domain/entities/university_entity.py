@@ -1,6 +1,7 @@
 from uuid import UUID
 
 from usal.core import BaseEntity
+from usal.domain.entities.common_entity import PageEntity
 
 
 class UniversityMajorEntity(BaseEntity):
@@ -52,7 +53,7 @@ class GetUniversityEntity(BaseEntity):
     acceptance_rate: str
     annual_fee: str
     student_faculty_ratio: str | None
-    available_majors: ListUniversityMajorsEntity
+    available_majors: list[UniversityMajorEntity]
     admission_requirements: list[str]
 
 
@@ -61,4 +62,34 @@ class ListUniversitiesEntity(BaseEntity):
     Entity model for listing universities.
     """
 
+    page_info: PageEntity
     records: list[GetUniversityEntity]
+
+
+class GetAdminUniversityEntity(BaseEntity):
+    """
+    Entity model for getting university details.
+    """
+
+    id: UUID
+    name: str
+    location: str
+    image: str
+    state: str
+    description: str | None
+    acceptance_rate: str
+    annual_fee: str
+    student_faculty_ratio: str | None
+    available_majors: list[UniversityMajorEntity]
+    admission_requirements: list[str]
+    view_count: int
+    status: str
+
+
+class ListAdminUniversitiesEntity(BaseEntity):
+    """
+    Entity model for listing universities.
+    """
+
+    page_info: PageEntity
+    records: list[GetAdminUniversityEntity]

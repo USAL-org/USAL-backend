@@ -1,0 +1,20 @@
+module default {
+    scalar type Gender extending enum<MALE, FEMALE, OTHERS>;
+    scalar type UserStatus extending enum<ACTIVE, INACTIVE, DELETED>;
+
+    type User extending DateTime {
+        required property full_name -> str;
+        required property email -> str;
+        required property phone_number -> str;
+        required property password_hash -> str;
+        property gender -> Gender;
+        required property verified -> bool{
+            default := False;
+        }
+        property pp_url -> str;
+        property date_of_birth -> cal::local_date;
+        required property status -> UserStatus {
+            default := UserStatus.ACTIVE;
+        }
+    }
+}

@@ -4,27 +4,41 @@ from fastapi import APIRouter, Depends
 from wireup import Inject
 
 from usal.api.schema.request.article_request import (
-    ArticleFilterRequest,
+    AdminArticleFilterRequest,
     CreateArticleCategoryRequest,
     CreateArticleRequest,
 )
-from usal.api.schema.request.author_request import CreateAuthorRequest
-from usal.api.schema.request.qa_request import CreateQARequest
-from usal.api.schema.request.resources_request import CreateResourcesRequest
+from usal.api.schema.request.author_request import (
+    CreateAuthorRequest,
+    FilterAuthorRequest,
+)
+from usal.api.schema.request.qa_request import (
+    AdminQAFilterRequest,
+    CreateQARequest,
+)
+from usal.api.schema.request.resources_request import (
+    AdminFilterResourcesRequest,
+    CreateResourcesRequest,
+)
 from usal.api.schema.response.article_response import (
+    ListAdminArticlesResponse,
     ListArticleCategoriesResponse,
-    ListArticlesResponse,
 )
 from usal.api.schema.response.author_response import ListAuthorsResponse
 from usal.api.schema.response.common_response import MessageResponse
-from usal.api.schema.response.qa_response import ListQAResponse
-from usal.api.schema.response.resources_response import ListResourcesResponse
+from usal.api.schema.response.qa_response import ListAdminQAResponse
+from usal.api.schema.response.resources_response import (
+    ListAdminResourcesResponse,
+)
 from usal.controllers.article_controller import ArticleController
 from usal.controllers.author_controller import AuthorController
 from usal.controllers.qa_controller import QAController
 from usal.controllers.resources_controller import ResourcesController
 from usal.core.api_response import APIResponse
-from usal.core.enums.qa import QAType
+from usal.core.jwt.jwt_bearer import JWTBearer
+from usal.core.jwt.jwt_payload import JWTPayload
+from usal.core.permission_checker import AdminPermissions
+from usal.util.perms import perms
 
 AdminRouter = APIRouter(
     tags=["Admin"],
@@ -33,77 +47,101 @@ AdminRouter = APIRouter(
 
 
 @AdminRouter.post("/author")
+@perms(AdminPermissions.ARTICLE_MANAGEMENT)
 async def create_author(
     request: CreateAuthorRequest,
     controller: Annotated[AuthorController, Inject()],
+    payload: JWTPayload = Depends(JWTBearer("admin")),
 ) -> APIResponse[MessageResponse]:
     return await controller.create_author(request)
 
 
 @AdminRouter.get("/authors")
+@perms(AdminPermissions.ARTICLE_MANAGEMENT)
 async def list_all_author(
     controller: Annotated[AuthorController, Inject()],
+    filter: FilterAuthorRequest = Depends(FilterAuthorRequest),
+    payload: JWTPayload = Depends(JWTBearer("admin")),
 ) -> APIResponse[ListAuthorsResponse]:
-    return await controller.list_all_author()
-
-
-@AdminRouter.post("/article")
-async def create_article(
-    request: CreateArticleRequest,
-    controller: Annotated[ArticleController, Inject()],
-) -> APIResponse[MessageResponse]:
-    return await controller.create_article(request)
-
-
-@AdminRouter.get("/articles")
-async def list_all_articles(
-    controller: Annotated[ArticleController, Inject()],
-    filter: ArticleFilterRequest = Depends(ArticleFilterRequest),
-) -> APIResponse[ListArticlesResponse]:
-    return await controller.list_all_articles(filter)
+    return await controller.list_all_author(
+        filter=filter,
+    )
 
 
 @AdminRouter.post("/article/category")
+@perms(AdminPermissions.ARTICLE_MANAGEMENT)
 async def create_article_category(
     request: CreateArticleCategoryRequest,
     controller: Annotated[ArticleController, Inject()],
+    payload: JWTPayload = Depends(JWTBearer("admin")),
 ) -> APIResponse[MessageResponse]:
     return await controller.create_article_category(request)
 
 
 @AdminRouter.get("/article/categories")
+@perms(AdminPermissions.ARTICLE_MANAGEMENT)
 async def list_all_article_categories(
     controller: Annotated[ArticleController, Inject()],
+    payload: JWTPayload = Depends(JWTBearer("admin")),
 ) -> APIResponse[ListArticleCategoriesResponse]:
     return await controller.list_all_article_categories()
 
 
+@AdminRouter.post("/article")
+@perms(AdminPermissions.ARTICLE_MANAGEMENT)
+async def create_article(
+    request: CreateArticleRequest,
+    controller: Annotated[ArticleController, Inject()],
+    payload: JWTPayload = Depends(JWTBearer("admin")),
+) -> APIResponse[MessageResponse]:
+    return await controller.create_article(request)
+
+
+@AdminRouter.get("/articles")
+@perms(AdminPermissions.ARTICLE_MANAGEMENT)
+async def list_all_articles(
+    controller: Annotated[ArticleController, Inject()],
+    filter: AdminArticleFilterRequest = Depends(AdminArticleFilterRequest),
+    payload: JWTPayload = Depends(JWTBearer("admin")),
+) -> APIResponse[ListAdminArticlesResponse]:
+    return await controller.list_all_articles(filter)
+
+
 @AdminRouter.post("/QA")
+@perms(AdminPermissions.QA_MANAGEMENT)
 async def create_QA(
     request: CreateQARequest,
     controller: Annotated[QAController, Inject()],
+    payload: JWTPayload = Depends(JWTBearer("admin")),
 ) -> APIResponse[MessageResponse]:
     return await controller.create_qa(request)
 
 
 @AdminRouter.get("/QAs")
+@perms(AdminPermissions.QA_MANAGEMENT)
 async def list_all_qa(
-    type: QAType,
     controller: Annotated[QAController, Inject()],
-) -> APIResponse[ListQAResponse]:
-    return await controller.list_all_qa(type)
+    filter: AdminQAFilterRequest = Depends(AdminQAFilterRequest),
+    payload: JWTPayload = Depends(JWTBearer("admin")),
+) -> APIResponse[ListAdminQAResponse]:
+    return await controller.list_all_qa(filter=filter)
 
 
 @AdminRouter.post("/resource")
+@perms(AdminPermissions.RESOURCES_MANAGEMENT)
 async def create_resource(
     request: CreateResourcesRequest,
     controller: Annotated[ResourcesController, Inject()],
+    payload: JWTPayload = Depends(JWTBearer("admin")),
 ) -> APIResponse[MessageResponse]:
     return await controller.create_resources(request)
 
 
 @AdminRouter.get("/resource")
+@perms(AdminPermissions.RESOURCES_MANAGEMENT)
 async def list_all_resources(
     controller: Annotated[ResourcesController, Inject()],
-) -> APIResponse[ListResourcesResponse]:
-    return await controller.list_all_resources()
+    filter: AdminFilterResourcesRequest = Depends(AdminFilterResourcesRequest),
+    payload: JWTPayload = Depends(JWTBearer("admin")),
+) -> APIResponse[ListAdminResourcesResponse]:
+    return await controller.list_all_resources(filter=filter)

@@ -1,4 +1,7 @@
-from usal.api.schema.request.author_request import CreateAuthorRequest
+from usal.api.schema.request.author_request import (
+    CreateAuthorRequest,
+    FilterAuthorRequest,
+)
 from usal.api.schema.response.author_response import (
     GetAuthorResponse,
     ListAuthorsResponse,
@@ -26,10 +29,12 @@ class AuthorController:
 
     async def list_all_author(
         self,
+        filter: FilterAuthorRequest,
     ) -> APIResponse[ListAuthorsResponse]:
-        author_obj = await self.usecase.list_all_author()
+        author_obj = await self.usecase.list_all_author(filter=filter)
         return api_response(
             ListAuthorsResponse(
+                **author_obj.page_info.model_dump(),
                 records=[
                     GetAuthorResponse.model_validate(author, from_attributes=True)
                     for author in author_obj.records
