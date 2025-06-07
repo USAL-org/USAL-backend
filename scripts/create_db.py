@@ -127,9 +127,6 @@ async def populate_default_data(
 async def validate_and_update_default_data(
     client: gel.AsyncIOClient, file_path: str = "himalaya/defaults/data"
 ) -> None:
-    """
-    Validate and update default data by checking SHA256 hashes.
-    """
     try:
         for root, _, files in os.walk(file_path):
             for filename in files:
