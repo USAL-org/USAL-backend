@@ -127,3 +127,13 @@ class UniversityFilterRequest(PaginationRequest):
     community_college: bool | None = Field(
         None, description="Whether to filter community colleges"
     )
+
+
+class StateRequest(BaseRequest):
+    """
+    Request model for getting universities by state.
+    """
+
+    id: UUID = Field(description="State ID to get universities")
+    name: str = Field(description="Name of the state")
+    country: str = Field(description="Country of the state")

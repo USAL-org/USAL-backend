@@ -1,0 +1,5 @@
+module default{
+    type DefaultSha extending DateTime
+        required property key -> str;
+        required property hash -> str;
+}
