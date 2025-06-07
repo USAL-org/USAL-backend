@@ -31,6 +31,21 @@ insert Admin {
 };
 """
 
+INSERT_SHA_QUERY = """
+insert DefaultSha {
+    key := <str>$key,
+    hash := <str>$hash
+};
+"""
+
+UPDATE_SHA_QUERY = """
+update DefaultSha
+filter .key = <str>$key
+set {
+    hash := <str>$hash
+};
+"""
+
 
 async def execute_query(
     client: gel.AsyncIOClient, query: str, params: dict = None
@@ -54,6 +69,7 @@ async def create_super_admin(client: gel.AsyncIOClient) -> None:
     existing_admin = await client.query_single(ADMIN_EXISTS_QUERY, username=username)
 
     if existing_admin:
+        print(f"Admin with username '{username}' already exists.")
         return
 
     params = {
@@ -74,125 +90,139 @@ async def populate_default_data(
     sheet_name: str | None = None,
 ) -> None:
     try:
+        print(f"Deleting existing {type_name} data...")
         await execute_query(client, f"delete {type_name};")
 
+        print(f"Converting Excel data from {file_path}...")
         data = await convert_excel_data_into_dictionary(
             client, file_path, mapping, sheet_name
         )
+        print(f"Parsed {len(data)} rows from {file_path}")
+        print("First 2 rows of parsed data:", data[:2])
 
         if not data:
+            print(f"No data found in {file_path}")
             return
 
-        chunk_size = 1000
-        total_inserted = 0
+        for i, row in enumerate(data):
+            if mapping:
+                mapped_row = {}
+                for file_col, db_field in mapping.items():
+                    if file_col in row:
+                        mapped_row[db_field] = row[file_col]
+                row = mapped_row
 
-        for i in range(0, len(data), chunk_size):
-            chunk = data[i : i + chunk_size]
+            fields = ", ".join([f"{k} := <str>${k}" for k in row.keys()])
+            query = f"""
+                insert {type_name} {{
+                    {fields}
+                }};
+            """
             try:
-                for row in chunk:
-                    if mapping:
-                        mapped_row = {}
-                        for file_col, db_field in mapping.items():
-                            if file_col in row:
-                                mapped_row[db_field] = row[file_col]
-                        row = mapped_row
-
-                    fields = ", ".join([f"{k} := <str>${k}" for k in row.keys()])
-                    query = f"""
-                        insert {type_name} {{
-                            {fields}
-                        }};
-                    """
-
-                    await client.query(query, **row)
-
-                total_inserted += len(chunk)
-
+                await client.query(query, **row)
             except Exception as e:
-                print(
-                    f"Error inserting chunk {i // chunk_size + 1} for {type_name}: {e}"
-                )
+                print(f"Error inserting row {i + 1}: {str(e)}")
+                print(f"Row data: {row}")
                 raise
 
-        if total_inserted != len(data):
-            raise Exception(
-                f"Mismatch in inserted records for {type_name}: inserted {total_inserted}, expected {len(data)}"
-            )
-
+        print(f"Successfully inserted {len(data)} records for {type_name}")
     except Exception as e:
         print(f"Unexpected error processing {type_name}: {str(e)}")
         raise
 
 
 async def validate_and_update_default_data(
-    client: gel.AsyncIOClient, file_path: str = "himalaya/defaults/data"
+    client: gel.AsyncIOClient, data_dir: str = "usal/defaults/data"
 ) -> None:
-    try:
-        for root, _, files in os.walk(file_path):
-            for filename in files:
-                full_file_path = os.path.join(root, filename)
+    print("Starting validation of default data SHA256 hashes...")
 
-                try:
-                    current_hash = await calculate_file_hash(full_file_path)
-                    existing_hash = await client.query_single(
-                        """
-                        select DefaultSHA { hash }
-                        filter .key = <str>$key
-                        limit 1;
-                        """,
-                        key=full_file_path,
+    for root, _, files in os.walk(data_dir):
+        for filename in files:
+            # Skip temporary Excel files
+            if filename.startswith("~$") or filename.startswith("."):
+                print(f"Skipping temporary/hidden file: {filename}")
+                continue
+
+            full_file_path = os.path.join(root, filename)
+
+            # Check if this file is in our DEFAULT_DATA_DICT
+            # Try different key formats that might be used
+            possible_keys = [
+                full_file_path,
+                filename,
+                os.path.relpath(full_file_path),
+                full_file_path.replace(os.sep, "/"),
+            ]
+
+            file_config = None
+            used_key = None
+            for key in possible_keys:
+                if key in DEFAULT_DATA_DICT:
+                    file_config = DEFAULT_DATA_DICT[key]
+                    used_key = key
+                    break
+
+            if not file_config:
+                print(
+                    f"File {full_file_path} not found in DEFAULT_DATA_DICT, skipping..."
+                )
+                continue
+
+            print(f"Processing file: {full_file_path}")
+            print(f"Calculating SHA256 hash for file: {full_file_path}")
+            current_hash = await calculate_file_hash(full_file_path)
+            print(f"SHA256 hash: {current_hash}")
+
+            # Check if hash exists in database
+            existing_hash = await client.query_single(
+                """
+                select DefaultSha {
+                    hash
+                } filter .key = <str>$key
+                limit 1;
+                """,
+                key=used_key,
+            )
+
+            should_populate = False
+
+            if existing_hash:
+                print(f"Found existing hash for {used_key}")
+                if current_hash != existing_hash.hash:
+                    print(f"Hash changed for {used_key}, updating data...")
+                    await execute_query(
+                        client,
+                        UPDATE_SHA_QUERY,
+                        params={"key": used_key, "hash": current_hash},
                     )
+                    should_populate = True
+                else:
+                    print(f"Hash unchanged for {used_key}, skipping data population")
+            else:
+                print(f"No existing hash found for {used_key}, creating new entry...")
+                await execute_query(
+                    client,
+                    INSERT_SHA_QUERY,
+                    params={"key": used_key, "hash": current_hash},
+                )
+                should_populate = True
 
-                    should_process = False
-                    if existing_hash:
-                        if existing_hash.hash != current_hash:
-                            should_process = True
-                        else:
-                            print(f"No change in hash for {full_file_path}, skipping.")
-                    else:
-                        should_process = True
+            if should_populate:
+                print(f"Populating data for {used_key}...")
+                for edgedb_type, input_model, sheet_name in file_config:
+                    print(f"  Processing {edgedb_type} from sheet '{sheet_name}'")
+                    await populate_default_data(
+                        client,
+                        full_file_path,
+                        edgedb_type,
+                        mapping=get_field_mapping(input_model),
+                        sheet_name=sheet_name,
+                    )
+                print(f"Completed populating data for {used_key}")
+            else:
+                print(f"Skipped populating data for {used_key} (no changes)")
 
-                    if should_process:
-                        for file_path, mappings in DEFAULT_DATA_DICT.items():
-                            for edgedb_type, input_model, sheet_name in mappings:
-                                await populate_default_data(
-                                    client,
-                                    file_path,
-                                    edgedb_type,
-                                    mapping=get_field_mapping(input_model),
-                                    sheet_name=sheet_name,
-                                )
-
-                        if existing_hash:
-                            await execute_query(
-                                client,
-                                """
-                                update DefaultSHA
-                                filter .key = <str>$key
-                                set {
-                                    hash := <str>$hash
-                                };
-                                """,
-                                {"key": full_file_path, "hash": current_hash},
-                            )
-                        else:
-                            await execute_query(
-                                client,
-                                """
-                                insert DefaultSHA {
-                                    key := <str>$key,
-                                    hash := <str>$hash
-                                };
-                                """,
-                                {"key": full_file_path, "hash": current_hash},
-                            )
-                except Exception as e:
-                    print(f"Error processing file {full_file_path}: {str(e)}")
-                    raise
-        print("Default data validation and updates completed.")
-    except Exception as e:
-        print(f"Error in default data validation: {str(e)}")
-        raise
+    print("Default data validation and updates completed.")
 
 
 async def main() -> None:
@@ -208,6 +238,9 @@ async def main() -> None:
 
     except Exception as e:
         print(f"An error occurred: {e}")
+        import traceback
+
+        traceback.print_exc()
     finally:
         await client.aclose()
 

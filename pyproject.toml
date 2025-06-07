@@ -17,6 +17,7 @@ dependencies = [
     "wireup==0.14.0",
     "pandas>=2.3.0",
     "numpy>=2.2.6",
+    "openpyxl>=3.1.5",
 ]
 
 [build-system]

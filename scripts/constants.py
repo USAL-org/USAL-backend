@@ -20,7 +20,7 @@ def get_field_mapping(input_model: InputModel) -> FieldMapping:
 
 
 DEFAULT_DATA_DICT: DefaultDataMapping = {
-    "himalaya/defaults/data/default_data.xlsx": [
+    "usal/defaults/data/states_with_country.xlsx": [
         (
             "State",
             StateRequest,
