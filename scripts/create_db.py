@@ -1,9 +1,13 @@
 import asyncio
+import os
 
 import gel
 
+from scripts.constants import DEFAULT_DATA_DICT, get_field_mapping
 from usal.core.config import DatabaseConfig
+from usal.util.calculate_file_hash import calculate_file_hash
 from usal.util.config import load_config
+from usal.util.excel_file import convert_excel_data_into_dictionary
 from usal.util.password_crypt import get_hashed_password
 
 
@@ -24,6 +28,21 @@ insert Admin {
     password_hash := <str>$password_hash,
     email := <str>$email,
     super_admin := <bool>$super_admin,
+};
+"""
+
+INSERT_SHA_QUERY = """
+insert DefaultSha {
+    key := <str>$key,
+    hash := <str>$hash
+};
+"""
+
+UPDATE_SHA_QUERY = """
+update DefaultSha
+filter .key = <str>$key
+set {
+    hash := <str>$hash
 };
 """
 
@@ -50,6 +69,7 @@ async def create_super_admin(client: gel.AsyncIOClient) -> None:
     existing_admin = await client.query_single(ADMIN_EXISTS_QUERY, username=username)
 
     if existing_admin:
+        print(f"Admin with username '{username}' already exists.")
         return
 
     params = {
@@ -62,6 +82,149 @@ async def create_super_admin(client: gel.AsyncIOClient) -> None:
     print(f"Admin with username '{username}' created successfully.")
 
 
+async def populate_default_data(
+    client: gel.AsyncIOClient,
+    file_path: str,
+    type_name: str,
+    mapping: dict[str, str] | None = None,
+    sheet_name: str | None = None,
+) -> None:
+    try:
+        print(f"Deleting existing {type_name} data...")
+        await execute_query(client, f"delete {type_name};")
+
+        print(f"Converting Excel data from {file_path}...")
+        data = await convert_excel_data_into_dictionary(
+            client, file_path, mapping, sheet_name
+        )
+        print(f"Parsed {len(data)} rows from {file_path}")
+        print("First 2 rows of parsed data:", data[:2])
+
+        if not data:
+            print(f"No data found in {file_path}")
+            return
+
+        for i, row in enumerate(data):
+            if mapping:
+                mapped_row = {}
+                for file_col, db_field in mapping.items():
+                    if file_col in row:
+                        mapped_row[db_field] = row[file_col]
+                row = mapped_row
+
+            fields = ", ".join([f"{k} := <str>${k}" for k in row.keys()])
+            query = f"""
+                insert {type_name} {{
+                    {fields}
+                }};
+            """
+            try:
+                await client.query(query, **row)
+            except Exception as e:
+                print(f"Error inserting row {i + 1}: {str(e)}")
+                print(f"Row data: {row}")
+                raise
+
+        print(f"Successfully inserted {len(data)} records for {type_name}")
+    except Exception as e:
+        print(f"Unexpected error processing {type_name}: {str(e)}")
+        raise
+
+
+async def validate_and_update_default_data(
+    client: gel.AsyncIOClient, data_dir: str = "usal/defaults/data"
+) -> None:
+    print("Starting validation of default data SHA256 hashes...")
+
+    for root, _, files in os.walk(data_dir):
+        for filename in files:
+            # Skip temporary Excel files
+            if filename.startswith("~$") or filename.startswith("."):
+                print(f"Skipping temporary/hidden file: {filename}")
+                continue
+
+            full_file_path = os.path.join(root, filename)
+
+            # Check if this file is in our DEFAULT_DATA_DICT
+            # Try different key formats that might be used
+            possible_keys = [
+                full_file_path,
+                filename,
+                os.path.relpath(full_file_path),
+                full_file_path.replace(os.sep, "/"),
+            ]
+
+            file_config = None
+            used_key = None
+            for key in possible_keys:
+                if key in DEFAULT_DATA_DICT:
+                    file_config = DEFAULT_DATA_DICT[key]
+                    used_key = key
+                    break
+
+            if not file_config:
+                print(
+                    f"File {full_file_path} not found in DEFAULT_DATA_DICT, skipping..."
+                )
+                continue
+
+            print(f"Processing file: {full_file_path}")
+            print(f"Calculating SHA256 hash for file: {full_file_path}")
+            current_hash = await calculate_file_hash(full_file_path)
+            print(f"SHA256 hash: {current_hash}")
+
+            # Check if hash exists in database
+            existing_hash = await client.query_single(
+                """
+                select DefaultSha {
+                    hash
+                } filter .key = <str>$key
+                limit 1;
+                """,
+                key=used_key,
+            )
+
+            should_populate = False
+
+            if existing_hash:
+                print(f"Found existing hash for {used_key}")
+                if current_hash != existing_hash.hash:
+                    print(f"Hash changed for {used_key}, updating data...")
+                    await execute_query(
+                        client,
+                        UPDATE_SHA_QUERY,
+                        params={"key": used_key, "hash": current_hash},
+                    )
+                    should_populate = True
+                else:
+                    print(f"Hash unchanged for {used_key}, skipping data population")
+            else:
+                print(f"No existing hash found for {used_key}, creating new entry...")
+                await execute_query(
+                    client,
+                    INSERT_SHA_QUERY,
+                    params={"key": used_key, "hash": current_hash},
+                )
+                should_populate = True
+
+            if should_populate:
+                print(f"Populating data for {used_key}...")
+                for edgedb_type, input_model, sheet_name in file_config:
+                    print(f"  Processing {edgedb_type} from sheet '{sheet_name}'")
+                    await populate_default_data(
+                        client,
+                        full_file_path,
+                        edgedb_type,
+                        mapping=get_field_mapping(input_model),
+                        sheet_name=sheet_name,
+                    )
+                print(f"Completed populating data for {used_key}")
+            else:
+                print(f"Skipped populating data for {used_key} (no changes)")
+
+    print("Default data validation and updates completed.")
+
+
 async def main() -> None:
     load_config()
     config = DatabaseConfig.build()
@@ -71,8 +234,13 @@ async def main() -> None:
     try:
         await configure_system(client)
         await create_super_admin(client)
+        await validate_and_update_default_data(client)
+
     except Exception as e:
         print(f"An error occurred: {e}")
+        import traceback
+
+        traceback.print_exc()
     finally:
         await client.aclose()
 
