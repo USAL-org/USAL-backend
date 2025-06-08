@@ -29,7 +29,6 @@ UniversityRouter = APIRouter(
 
 
 @UniversityRouter.get("/states")
-@perms(AdminPermissions.UNIVERSITY_MANAGEMENT)
 async def list_states(
     controller: Annotated[UniversityController, Inject()],
     filter: MajorAndStateFilterRequest = Depends(MajorAndStateFilterRequest),
@@ -38,7 +37,6 @@ async def list_states(
 
 
 @UniversityRouter.get("/majors")
-@perms(AdminPermissions.UNIVERSITY_MANAGEMENT)
 async def list_university_majors(
     controller: Annotated[UniversityController, Inject()],
     filter: MajorAndStateFilterRequest = Depends(MajorAndStateFilterRequest),
