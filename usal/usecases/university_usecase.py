@@ -2,6 +2,7 @@ from usal.api.schema.request.university_request import (
     AddUniversityMajorRequest,
     AddUniversityRequest,
     AdminUniversityFilterRequest,
+    MajorAndStateFilterRequest,
     UniversityFilterRequest,
 )
 from usal.domain.entities.university_entity import (
@@ -22,16 +23,22 @@ class UniversityUsecase:
     ) -> None:
         self.repo = repo
 
-    async def list_states(self) -> ListStatesEntity:
-        return await self.repo.list_states()
+    async def list_states(
+        self,
+        filter: MajorAndStateFilterRequest,
+    ) -> ListStatesEntity:
+        return await self.repo.list_states(search=filter.search)
 
     async def add_university_major(self, request: AddUniversityMajorRequest) -> None:
         return await self.repo.add_university_major(
             name=request.name,
         )
 
-    async def list_university_majors(self) -> ListUniversityMajorsEntity:
-        return await self.repo.list_university_majors()
+    async def list_university_majors(
+        self,
+        filter: MajorAndStateFilterRequest,
+    ) -> ListUniversityMajorsEntity:
+        return await self.repo.list_university_majors(search=filter.search)
 
     async def add_university(self, request: AddUniversityRequest) -> None:
         return await self.repo.add_university(

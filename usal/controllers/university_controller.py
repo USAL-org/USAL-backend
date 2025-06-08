@@ -31,7 +31,7 @@ class UniversityController:
         self,
         filter: MajorAndStateFilterRequest,
     ) -> APIResponse[ListStatesResponse]:
-        states_obj = await self.usecase.list_states()
+        states_obj = await self.usecase.list_states(filter)
         return api_response(
             ListStatesResponse(
                 records=[
@@ -53,7 +53,7 @@ class UniversityController:
     async def list_university_majors(
         self, filter: MajorAndStateFilterRequest
     ) -> APIResponse[ListUniversityMajorsResponse]:
-        majors_obj = await self.usecase.list_university_majors()
+        majors_obj = await self.usecase.list_university_majors(filter)
         return api_response(
             ListUniversityMajorsResponse(
                 records=[
