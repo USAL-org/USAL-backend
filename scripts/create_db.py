@@ -90,8 +90,8 @@ async def populate_default_data(
     sheet_name: str | None = None,
 ) -> None:
     try:
-        print(f"Deleting existing {type_name} data...")
-        await execute_query(client, f"delete {type_name};")
+        # print(f"Deleting existing {type_name} data...")
+        # await execute_query(client, f"delete {type_name};")
 
         print(f"Converting Excel data from {file_path}...")
         data = await convert_excel_data_into_dictionary(
