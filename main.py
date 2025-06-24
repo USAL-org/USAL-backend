@@ -36,6 +36,7 @@ def create_app() -> FastAPI:
             "http://localhost:4000",
             "http://127.0.0.1:5502",
             "http://localhost:5502",
+            "https://usaselflern.com",
         ],
         allow_credentials=True,
         allow_methods=["*"],
