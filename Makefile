@@ -22,13 +22,13 @@ clean-docker:
     fi
 
 up:
-	ENV=local docker compose up -d --build
+	ENV=local docker-compose up -d --build
 
 start:
 	ENV=local docker compose up --watch --build
 
 down:
-	docker compose down
+	docker-compose down
 
 build:
 	ENV=local docker compose up -d --build
