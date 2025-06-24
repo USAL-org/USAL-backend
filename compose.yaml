@@ -4,7 +4,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      target: ${TARGET:-${ENV:-local}}
+      target: ${TARGET}
     environment:
       - ENV=${ENV:-local}
     ports:
