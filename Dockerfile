@@ -21,8 +21,8 @@ ENV VIRTUAL_ENV=${VENV_PATH}
 
 WORKDIR /project
 COPY pyproject.toml README.md ./
-RUN uv pip install -r pyproject.toml
-
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv pip install -r pyproject.toml
 COPY usal ./usal
 RUN uv pip install -e .
 
