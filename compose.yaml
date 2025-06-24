@@ -4,7 +4,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      target: ${TARGET}
+      target: ${TARGET:-${ENV:-local}}
     environment:
       - ENV=${ENV:-local}
     ports:
@@ -15,22 +15,19 @@ services:
         condition: service_healthy
     networks:
       - usal-net
-    volumes:
-        - .:/project
-
-    # develop:
-    #   watch:
-    #     - action: sync
-    #       path: .
-    #       target: /project
-    #       ignore:
-    #         - .venv/
-    #     - action: rebuild
-    #       path: ./pyproject.toml
-    #     - action: rebuild
-    #       path: ./Makefile
-    #     - action: rebuild
-    #       path: ./configs/local.yaml
+    develop:
+      watch:
+        - action: sync
+          path: .
+          target: /project
+          ignore:
+            - .venv/
+        - action: rebuild
+          path: ./pyproject.toml
+        - action: rebuild
+          path: ./Makefile
+        - action: rebuild
+          path: ./configs/local.yaml
 
   usal.db:
     container_name: usal.db
