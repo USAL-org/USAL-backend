@@ -15,19 +15,22 @@ services:
         condition: service_healthy
     networks:
       - usal-net
-    develop:
-      watch:
-        - action: sync
-          path: .
-          target: /project
-          ignore:
-            - .venv/
-        - action: rebuild
-          path: ./pyproject.toml
-        - action: rebuild
-          path: ./Makefile
-        - action: rebuild
-          path: ./configs/local.yaml
+    volumes:
+        - .:/project
+
+    # develop:
+    #   watch:
+    #     - action: sync
+    #       path: .
+    #       target: /project
+    #       ignore:
+    #         - .venv/
+    #     - action: rebuild
+    #       path: ./pyproject.toml
+    #     - action: rebuild
+    #       path: ./Makefile
+    #     - action: rebuild
+    #       path: ./configs/local.yaml
 
   usal.db:
     container_name: usal.db
