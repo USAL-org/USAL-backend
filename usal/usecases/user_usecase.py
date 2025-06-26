@@ -37,7 +37,11 @@ class UserUsecase:
 
     async def user_sign_up(self, request: UserSignUpRequest) -> OTPSentEntity | None:
         try:
-            await self.repo.user_exists(request.email)
+            if await self.repo.user_exists(request.email):
+                raise api_exception(
+                    "User already exists with this email.",
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                )
             user = await self.repo.user_create(
                 full_name=request.full_name,
                 email=request.email,
