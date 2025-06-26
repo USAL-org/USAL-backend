@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 import dataclasses
+import datetime
 import enum
 import gel
 import uuid
@@ -14,14 +15,12 @@ class NoPydanticValidation:
     def __get_pydantic_core_schema__(cls, _source_type, _handler):
         # Pydantic 2.x
         from pydantic_core.core_schema import any_schema
-
         return any_schema()
 
     @classmethod
     def __get_validators__(cls):
         # Pydantic 1.x
         from pydantic.dataclasses import dataclass as pydantic_dataclass
-
         _ = pydantic_dataclass(cls)
         cls.__pydantic_model__.__get_validators__ = lambda: []
         return []
@@ -37,6 +36,8 @@ class ListUserArticlesResult(NoPydanticValidation):
     id: uuid.UUID
     title: str
     cover_image: str
+    created_at: datetime.datetime
+    duration: str | None
     author: ListUserArticlesResultAuthor
 
 
@@ -77,6 +78,8 @@ async def list_user_articles(
             id,
             title,
             cover_image,
+            created_at,
+            duration,
             author: {
                 id,
                 full_name,

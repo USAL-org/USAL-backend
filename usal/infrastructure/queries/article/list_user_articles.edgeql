@@ -18,6 +18,8 @@ SELECT FILTERED_ARTICLE {
     id,
     title,
     cover_image,
+    created_at,
+    duration,
     author: {
         id,
         full_name,

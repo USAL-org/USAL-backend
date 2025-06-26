@@ -49,6 +49,8 @@ class GetArticleResponse(BaseSchema):
     id: UUID
     title: str
     cover_image: str
+    created_at: datetime
+    duration: str | None
     author: GetAuthorResponse
 
 
