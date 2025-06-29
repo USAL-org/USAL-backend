@@ -36,12 +36,12 @@ class UserUsecase:
         self.otp_repo = otp_repo
 
     async def user_sign_up(self, request: UserSignUpRequest) -> OTPSentEntity | None:
+        if await self.repo.user_exists(request.email):
+            raise api_exception(
+                "User already exists with this email.",
+                status_code=status.HTTP_400_BAD_REQUEST,
+            )
         try:
-            if await self.repo.user_exists(request.email):
-                raise api_exception(
-                    "User already exists with this email.",
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                )
             user = await self.repo.user_create(
                 full_name=request.full_name,
                 email=request.email,
@@ -55,7 +55,6 @@ class UserUsecase:
                     email=user.email,
                 )
                 return OTPSentEntity(verification_id=otp.id, destination=user.email)
-
         except Exception as e:
             raise api_exception(
                 "Error while saving otp for the user. Try to login with the same credential to get new otp.",
