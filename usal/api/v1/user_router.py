@@ -9,11 +9,15 @@ from usal.api.schema.request.article_request import (
 )
 from usal.api.schema.request.qa_request import QAFilterRequest
 from usal.api.schema.request.resources_request import FilterResourcesRequest
-from usal.api.schema.request.university_request import UniversityFilterRequest
+from usal.api.schema.request.university_request import (
+    MatchUniversityRequest,
+    UniversityFilterRequest,
+)
 from usal.api.schema.response.article_response import (
     ListArticlesResponse,
     ViewArticleDetailsResponse,
 )
+from usal.api.schema.response.common_response import MessageResponse
 from usal.api.schema.response.qa_response import ListQAResponse, ViewQAResponse
 from usal.api.schema.response.resources_response import ListResourcesResponse
 from usal.api.schema.response.university_response import ListUniversitiesResponse
@@ -86,3 +90,20 @@ async def list_featured_universities(
     filter: UniversityFilterRequest = Depends(UniversityFilterRequest),
 ) -> APIResponse[ListUniversitiesResponse]:
     return await controller.list_featured_universities(filter)
+
+
+@UserRouter.get("/university/visit/{id}")
+async def visit_university(
+    id: UUID,
+    controller: Annotated[UniversityController, Inject()],
+    payload: JWTPayload = Depends(JWTBearer("user")),
+) -> APIResponse[MessageResponse]:
+    return await controller.visit_university(university_id=id)
+
+
+@UserRouter.get("/match-university")
+async def match_university(
+    controller: Annotated[UniversityController, Inject()],
+    filter: MatchUniversityRequest = Depends(MatchUniversityRequest),
+) -> APIResponse[ListUniversitiesResponse]:
+    return await controller.match_university(filter)

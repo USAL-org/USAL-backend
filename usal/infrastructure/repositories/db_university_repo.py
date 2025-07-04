@@ -20,13 +20,16 @@ from usal.infrastructure.queries.university import (
     add_university_async_edgeql,
     get_all_uni_count_async_edgeql,
     get_featured_uni_count_async_edgeql,
+    get_match_uni_count_async_edgeql,
     get_user_uni_count_async_edgeql,
+    increase_view_count_async_edgeql,
     list_degrees_async_edgeql,
     list_featured_universities_async_edgeql,
     list_states_async_edgeql,
     list_uni_majors_async_edgeql,
     list_universities_async_edgeql,
     list_user_university_async_edgeql,
+    match_university_list_async_edgeql,
 )
 from usal.infrastructure.repositories.pagination_repo import paginate
 
@@ -104,8 +107,8 @@ class DbUniversityRepo(UniversityRepo):
         community_college: bool,
         state: UUID,
         description: str,
-        acceptance_rate: str,
-        annual_fee: str,
+        acceptance_rate: float,
+        annual_fee: float,
         student_faculty_ratio: str,
         available_majors: list[UUID],
         admission_requirements: list[str],
@@ -114,6 +117,8 @@ class DbUniversityRepo(UniversityRepo):
         rating: float,
         url: str,
         featured: bool,
+        test_required: bool,
+        min_gpa: float,
     ) -> None:
         async with self.session() as session:
             db_university = await add_university_async_edgeql.add_university(
@@ -135,6 +140,8 @@ class DbUniversityRepo(UniversityRepo):
                 rating=rating,
                 url=url,
                 featured=featured,
+                min_gpa=min_gpa,
+                test_required=test_required,
             )
             if not db_university:
                 raise api_exception(
@@ -290,6 +297,82 @@ class DbUniversityRepo(UniversityRepo):
                 application_fee=application_fee,
                 community_college=community_college,
                 degree=degree,
+            )
+            university_entity = []
+            for university in db_universities:
+                university_dict = {
+                    "id": university.id,
+                    "name": university.name,
+                    "location": university.location,
+                    "image": university.image,
+                    "state": university.state.name,
+                    "description": university.description,
+                    "acceptance_rate": university.acceptance_rate,
+                    "annual_fee": university.annual_fee,
+                    "student_faculty_ratio": university.student_faculty_ratio,
+                    "available_majors": university.available_majors,
+                    "admission_requirements": university.admission_requirements,
+                    "degree": university.degree,
+                    "url": university.url,
+                    "rating": university.rating,
+                }
+                university_entity.append(
+                    GetUniversityEntity.model_validate(
+                        university_dict, from_attributes=True
+                    )
+                )
+            return ListUniversitiesEntity(
+                page_info=page_info,
+                records=university_entity,
+            )
+
+    @override
+    async def visit_university(self, university_id: UUID) -> None:
+        async with self.session() as session:
+            db_university = await increase_view_count_async_edgeql.increase_view_count(
+                session,
+                university_id=university_id,
+            )
+            if not db_university:
+                raise api_exception(
+                    message="Unable to visit university. Please try again.",
+                )
+
+    @override
+    async def match_university(
+        self,
+        page: int,
+        limit: int,
+        major: UUID,
+        degree: UUID,
+        min_gpa: float,
+        test_required: bool,
+        min_fee: float,
+        max_fee: float,
+    ) -> ListUniversitiesEntity:
+        async with self.session() as session:
+            total_count = await get_match_uni_count_async_edgeql.get_match_uni_count(
+                session,
+                major=major,
+                degree=degree,
+                min_gpa=min_gpa,
+                test_required=test_required,
+                min_fee=min_fee,
+                max_fee=max_fee,
+            )
+            page_info = await paginate(total_count.total_count, page, limit)
+            db_universities = (
+                await match_university_list_async_edgeql.match_university_list(
+                    session,
+                    offset=page_info.offset,
+                    limit=limit,
+                    major=major,
+                    degree=degree,
+                    min_gpa=min_gpa,
+                    test_required=test_required,
+                    min_fee=min_fee,
+                    max_fee=max_fee,
+                )
             )
             university_entity = []
             for university in db_universities:

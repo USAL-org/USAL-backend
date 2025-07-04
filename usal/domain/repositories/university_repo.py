@@ -74,8 +74,8 @@ class UniversityRepo(DbRepo):
         community_college: bool,
         state: UUID,
         description: str,
-        acceptance_rate: str,
-        annual_fee: str,
+        acceptance_rate: float,
+        annual_fee: float,
         student_faculty_ratio: str,
         available_majors: list[UUID],
         admission_requirements: list[str],
@@ -84,6 +84,8 @@ class UniversityRepo(DbRepo):
         rating: float,
         url: str,
         featured: bool,
+        test_required: bool,
+        min_gpa: float,
     ) -> None:
         """
         Add a university.
@@ -185,4 +187,48 @@ class UniversityRepo(DbRepo):
 
         Returns:
             ListUniversitiesEntity: List of featured universities.
+        """
+
+    @abstractmethod
+    async def visit_university(
+        self,
+        university_id: UUID,
+    ) -> None:
+        """
+        Increment the view count of a university.
+
+        Parameters:
+            university_id (UUID): ID of the university to visit.
+
+        Returns:
+            None
+        """
+
+    @abstractmethod
+    async def match_university(
+        self,
+        page: int,
+        limit: int,
+        major: UUID,
+        degree: UUID,
+        min_gpa: float,
+        test_required: bool,
+        min_fee: float,
+        max_fee: float,
+    ) -> ListUniversitiesEntity:
+        """
+        Match universities based on user preferences.
+
+        Parameters:
+            page (int): Page number for pagination.
+            limit (int): Number of records per page.
+            major (UUID): Major ID for filtering universities.
+            degree (UUID): Degree ID for filtering universities.
+            min_gpa (float): Minimum GPA required for admission.
+            test_required (bool): Whether a test is required for admission.
+            min_fee (float): Minimum annual fee of the university.
+            max_fee (float): Maximum annual fee of the university.
+
+        Returns:
+            ListUniversitiesEntity: List of matched universities.
         """

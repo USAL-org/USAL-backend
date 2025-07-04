@@ -1,8 +1,10 @@
+from uuid import UUID
 from usal.api.schema.request.university_request import (
     AddUniversityMajorRequest,
     AddUniversityRequest,
     AdminUniversityFilterRequest,
     MajorAndStateFilterRequest,
+    MatchUniversityRequest,
     UniversityFilterRequest,
 )
 from usal.api.schema.response.common_response import MessageResponse
@@ -126,6 +128,30 @@ class UniversityController:
         filter: UniversityFilterRequest,
     ) -> APIResponse[ListUniversitiesResponse]:
         universities_obj = await self.usecase.list_featured_universities(filter)
+        return api_response(
+            ListUniversitiesResponse(
+                **universities_obj.page_info.model_dump(),
+                records=[
+                    GetUniversityResponse.model_validate(
+                        university, from_attributes=True
+                    )
+                    for university in universities_obj.records
+                ],
+            )
+        )
+
+    async def visit_university(
+        self,
+        university_id: UUID,
+    ) -> APIResponse[MessageResponse]:
+        await self.usecase.visit_university(university_id=university_id)
+        return api_response(MessageResponse(message="University visited successfully"))
+
+    async def match_university(
+        self,
+        filter: MatchUniversityRequest,
+    ) -> APIResponse[ListUniversitiesResponse]:
+        universities_obj = await self.usecase.match_university(filter)
         return api_response(
             ListUniversitiesResponse(
                 **universities_obj.page_info.model_dump(),

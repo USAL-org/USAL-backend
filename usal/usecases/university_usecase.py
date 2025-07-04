@@ -1,8 +1,10 @@
+from uuid import UUID
 from usal.api.schema.request.university_request import (
     AddUniversityMajorRequest,
     AddUniversityRequest,
     AdminUniversityFilterRequest,
     MajorAndStateFilterRequest,
+    MatchUniversityRequest,
     UniversityFilterRequest,
 )
 from usal.domain.entities.university_entity import (
@@ -65,6 +67,8 @@ class UniversityUsecase:
             rating=request.rating,
             url=request.url,
             featured=request.featured,
+            test_required=request.test_required,
+            min_gpa=request.min_gpa,
         )
 
     async def list_universities(
@@ -125,6 +129,37 @@ class UniversityUsecase:
             degree=filter.degree,
             application_fee=filter.application_fee,
             community_college=filter.community_college,
+        )
+        return ListUniversitiesEntity(
+            page_info=uni_obj.page_info,
+            records=[
+                GetUniversityEntity.model_validate(
+                    university,
+                    from_attributes=True,
+                )
+                for university in uni_obj.records
+            ],
+        )
+
+    async def visit_university(
+        self,
+        university_id: UUID,
+    ) -> None:
+        return await self.repo.visit_university(university_id=university_id)
+
+    async def match_university(
+        self,
+        filter: MatchUniversityRequest,
+    ) -> ListUniversitiesEntity:
+        uni_obj = await self.repo.match_university(
+            page=filter.page,
+            limit=filter.limit,
+            major=filter.major,
+            degree=filter.degree,
+            max_fee=filter.max_fee,
+            min_fee=filter.min_fee,
+            min_gpa=filter.min_gpa,
+            test_required=filter.test_required,
         )
         return ListUniversitiesEntity(
             page_info=uni_obj.page_info,

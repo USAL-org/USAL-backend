@@ -40,8 +40,8 @@ class ListUserUniversityResult(NoPydanticValidation):
     image: str
     state: ListUserUniversityResultState
     description: str | None
-    acceptance_rate: str
-    annual_fee: str
+    acceptance_rate: float
+    annual_fee: float
     student_faculty_ratio: str | None
     available_majors: list[ListUserUniversityResultAvailableMajorsItem]
     degree: list[ListUserUniversityResultDegreeItem]
