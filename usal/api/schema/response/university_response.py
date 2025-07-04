@@ -67,8 +67,8 @@ class GetUniversityResponse(BaseSchema):
     image: str
     state: str
     description: str | None
-    acceptance_rate: str
-    annual_fee: str
+    acceptance_rate: float
+    annual_fee: float
     student_faculty_ratio: str | None
     available_majors: list[UniversityMajorResponse]
     admission_requirements: list[str]
@@ -96,8 +96,8 @@ class GetAdminUniversityResponse(BaseSchema):
     image: str
     state: str
     description: str | None
-    acceptance_rate: str
-    annual_fee: str
+    acceptance_rate: float
+    annual_fee: float
     student_faculty_ratio: str | None
     available_majors: list[UniversityMajorResponse]
     admission_requirements: list[str]

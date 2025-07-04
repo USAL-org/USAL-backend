@@ -21,8 +21,8 @@ class AddUniversityRequest(BaseRequest):
     )
     state: UUID = Field(description="State ID where the university is located")
     description: str = Field(description="Description of the university")
-    acceptance_rate: str = Field(description="Acceptance rate of the university")
-    annual_fee: str = Field(description="Annual fee of the university")
+    acceptance_rate: float = Field(description="Acceptance rate of the university")
+    annual_fee: float = Field(description="Annual fee of the university")
     student_faculty_ratio: str = Field(
         description="Student to faculty ratio of the university"
     )
@@ -42,6 +42,14 @@ class AddUniversityRequest(BaseRequest):
     )
     degrees: list[UUID] = Field(
         description="List of degree IDs associated with the university"
+    )
+    test_required: bool = Field(
+        default=False, description="Whether a test is required for admission"
+    )
+    min_gpa: float = Field(
+        le=4.0,
+        gt=0.0,
+        description="Minimum GPA required for admission to the university",
     )
 
 
@@ -63,10 +71,10 @@ class UpdateUniversityRequest(BaseRequest):
         None, description="State ID where the university is located"
     )
     description: str | None = Field(None, description="Description of the university")
-    acceptance_rate: str | None = Field(
+    acceptance_rate: float | None = Field(
         None, description="Acceptance rate of the university"
     )
-    annual_fee: str | None = Field(None, description="Annual fee of the university")
+    annual_fee: float | None = Field(None, description="Annual fee of the university")
     student_faculty_ratio: str | None = Field(
         None, description="Student to faculty ratio of the university"
     )
@@ -138,6 +146,23 @@ class UniversityFilterRequest(PaginationRequest):
     degree: UUID | None = Field(
         None, description="Degree ID for filtering universities"
     )
+
+
+class MatchUniversityRequest(PaginationRequest):
+    """
+    Request model for matching universities based on user preferences.
+    """
+
+    major: UUID = Field(description="Major ID for filtering universities")
+    degree: UUID = Field(description="Degree ID for filtering universities")
+    min_gpa: float = Field(
+        le=4.0,
+        gt=0.0,
+        description="Minimum GPA required for admission to the university",
+    )
+    test_required: bool = Field(description="Whether a test is required for admission")
+    min_fee: float = Field(description="Minimum annual fee of the university")
+    max_fee: float = Field(description="Maximum annual fee of the university")
 
 
 class StateRequest(BaseRequest):

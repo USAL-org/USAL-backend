@@ -67,8 +67,8 @@ class GetUniversityEntity(BaseEntity):
     image: str
     state: str
     description: str | None
-    acceptance_rate: str
-    annual_fee: str
+    acceptance_rate: float
+    annual_fee: float
     student_faculty_ratio: str | None
     available_majors: list[UniversityMajorEntity]
     admission_requirements: list[str]
@@ -97,8 +97,8 @@ class GetAdminUniversityEntity(BaseEntity):
     image: str
     state: str
     description: str | None
-    acceptance_rate: str
-    annual_fee: str
+    acceptance_rate: float
+    annual_fee: float
     student_faculty_ratio: str | None
     available_majors: list[UniversityMajorEntity]
     admission_requirements: list[str]

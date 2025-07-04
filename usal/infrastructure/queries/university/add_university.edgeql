@@ -9,8 +9,10 @@ INSERT University{
         FILTER .id = <uuid>$state
     ),
     description := <str>$description,
-    acceptance_rate := <str>$acceptance_rate,
-    annual_fee := <str>$annual_fee,
+    acceptance_rate := <float64>$acceptance_rate,
+    annual_fee := <float64>$annual_fee,
+    min_gpa := <float64>$min_gpa,
+    test_required := <bool>$test_required,
     student_faculty_ratio := <str>$student_faculty_ratio,
     available_majors := DISTINCT((
         FOR id IN array_unpack(<array<uuid>>$available_majors)
