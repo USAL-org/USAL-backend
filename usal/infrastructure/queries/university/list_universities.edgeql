@@ -30,4 +30,11 @@ SELECT FILTERED_UNIVERSITY {
     admission_requirements,
     status,
     view_count,
+    degree :{
+        id,
+        name,
+    },
+    url,
+    rating, 
+    featured,
 }

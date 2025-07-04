@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 import dataclasses
+import enum
 import gel
 import uuid
 
@@ -24,6 +25,13 @@ class NoPydanticValidation:
         return []
 
 
+class DegreeNames(enum.Enum):
+    ASSOCIATES_DEGREE = "ASSOCIATES_DEGREE"
+    BACHELORS_DEGREE = "BACHELORS_DEGREE"
+    MASTERS_DEGREE = "MASTERS_DEGREE"
+    DOCTORAL_DEGREE = "DOCTORAL_DEGREE"
+
+
 @dataclasses.dataclass
 class ListUserUniversityResult(NoPydanticValidation):
     id: uuid.UUID
@@ -36,6 +44,9 @@ class ListUserUniversityResult(NoPydanticValidation):
     annual_fee: str
     student_faculty_ratio: str | None
     available_majors: list[ListUserUniversityResultAvailableMajorsItem]
+    degree: list[ListUserUniversityResultDegreeItem]
+    url: str | None
+    rating: float | None
     admission_requirements: list[str]
 
 
@@ -43,6 +54,12 @@ class ListUserUniversityResult(NoPydanticValidation):
 class ListUserUniversityResultAvailableMajorsItem(NoPydanticValidation):
     id: uuid.UUID
     name: str
+
+
+@dataclasses.dataclass
+class ListUserUniversityResultDegreeItem(NoPydanticValidation):
+    id: uuid.UUID
+    name: DegreeNames
 
 
 @dataclasses.dataclass
@@ -57,6 +74,7 @@ async def list_user_university(
     search: str | None = None,
     state: uuid.UUID | None = None,
     major: uuid.UUID | None = None,
+    degree: uuid.UUID | None = None,
     application_fee: bool | None = None,
     community_college: bool | None = None,
     offset: int | None = None,
@@ -68,6 +86,7 @@ async def list_user_university(
             search := <optional str>$search,
             state := <optional uuid>$state,
             major := <optional uuid>$major,
+            degree := <optional uuid>$degree,
             application_fee := <optional bool>$application_fee,
             community_college := <optional bool>$community_college,
 
@@ -78,6 +97,7 @@ async def list_user_university(
             )
             AND (.state.id = state IF EXISTS state ELSE TRUE)
             AND (.available_majors.id = major IF EXISTS major ELSE TRUE)
+            AND (.degree.id = degree IF EXISTS degree ELSE TRUE)
             AND (.application_fee = application_fee IF EXISTS application_fee ELSE TRUE)
             AND (.community_college = community_college IF EXISTS community_college ELSE TRUE)
             AND (.status = UniversityStatus.ACTIVE)
@@ -102,12 +122,19 @@ async def list_user_university(
                 id,
                 name,
             },
+            degree :{
+                id,
+                name,
+            },
+            url,
+            rating, 
             admission_requirements,
         }\
         """,
         search=search,
         state=state,
         major=major,
+        degree=degree,
         application_fee=application_fee,
         community_college=community_college,
         offset=offset,

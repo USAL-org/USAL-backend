@@ -51,6 +51,10 @@ async def add_university(
     available_majors: list[uuid.UUID],
     admission_requirements: list[str],
     status: UniversityStatus,
+    degrees: list[uuid.UUID],
+    url: str,
+    rating: float,
+    featured: bool,
 ) -> AddUniversityResult:
     return await executor.query_single(
         """\
@@ -81,6 +85,16 @@ async def add_university(
                 ELSE {}
             ),
             status := <UniversityStatus>$status,
+            degree := DISTINCT((
+                FOR id IN array_unpack(<array<uuid>>$degrees)
+                UNION (
+                    SELECT Degree 
+                    FILTER .id = id
+                )
+            )),
+            url := <str>$url,
+            rating := <float64>$rating,
+            featured := <bool>$featured,
         }\
         """,
         name=name,
@@ -96,4 +110,8 @@ async def add_university(
         available_majors=available_majors,
         admission_requirements=admission_requirements,
         status=status,
+        degrees=degrees,
+        url=url,
+        rating=rating,
+        featured=featured,
     )

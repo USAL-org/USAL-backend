@@ -8,8 +8,10 @@ from usal.domain.entities.university_entity import (
     ListAdminUniversitiesEntity,
     ListStatesEntity,
     ListUniversitiesEntity,
+    ListUniversityDegreesEntity,
     ListUniversityMajorsEntity,
     StateEntity,
+    UniversityDegreeEntity,
     UniversityMajorEntity,
 )
 from usal.domain.repositories.university_repo import UniversityRepo
@@ -17,7 +19,10 @@ from usal.infrastructure.queries.university import (
     add_uni_major_async_edgeql,
     add_university_async_edgeql,
     get_all_uni_count_async_edgeql,
+    get_featured_uni_count_async_edgeql,
     get_user_uni_count_async_edgeql,
+    list_degrees_async_edgeql,
+    list_featured_universities_async_edgeql,
     list_states_async_edgeql,
     list_uni_majors_async_edgeql,
     list_universities_async_edgeql,
@@ -77,6 +82,19 @@ class DbUniversityRepo(UniversityRepo):
             )
 
     @override
+    async def list_university_degrees(self) -> ListUniversityDegreesEntity:
+        async with self.session() as session:
+            db_university_degrees = await list_degrees_async_edgeql.list_degrees(
+                session,
+            )
+            return ListUniversityDegreesEntity(
+                records=[
+                    UniversityDegreeEntity.model_validate(degree, from_attributes=True)
+                    for degree in db_university_degrees
+                ],
+            )
+
+    @override
     async def add_university(
         self,
         name: str,
@@ -92,6 +110,10 @@ class DbUniversityRepo(UniversityRepo):
         available_majors: list[UUID],
         admission_requirements: list[str],
         status: UniversityStatus,
+        degrees: list[UUID],
+        rating: float,
+        url: str,
+        featured: bool,
     ) -> None:
         async with self.session() as session:
             db_university = await add_university_async_edgeql.add_university(
@@ -109,6 +131,10 @@ class DbUniversityRepo(UniversityRepo):
                 available_majors=available_majors,
                 admission_requirements=admission_requirements,
                 status=status,
+                degrees=degrees,
+                rating=rating,
+                url=url,
+                featured=featured,
             )
             if not db_university:
                 raise api_exception(
@@ -150,6 +176,10 @@ class DbUniversityRepo(UniversityRepo):
                     "admission_requirements": university.admission_requirements,
                     "view_count": university.view_count,
                     "status": university.status,
+                    "degree": university.degree,
+                    "url": university.url,
+                    "rating": university.rating,
+                    "featured": university.featured,
                 }
                 university_entity.append(
                     GetAdminUniversityEntity.model_validate(
@@ -169,6 +199,7 @@ class DbUniversityRepo(UniversityRepo):
         search: str | None = None,
         state: UUID | None = None,
         major: UUID | None = None,
+        degree: UUID | None = None,
         application_fee: bool | None = None,
         community_college: bool | None = None,
     ) -> ListUniversitiesEntity:
@@ -178,6 +209,7 @@ class DbUniversityRepo(UniversityRepo):
                 search=search,
                 state=state,
                 major=major,
+                degree=degree,
                 application_fee=application_fee,
                 community_college=community_college,
             )
@@ -192,6 +224,7 @@ class DbUniversityRepo(UniversityRepo):
                     major=major,
                     application_fee=application_fee,
                     community_college=community_college,
+                    degree=degree,
                 )
             )
             university_entity = []
@@ -208,6 +241,73 @@ class DbUniversityRepo(UniversityRepo):
                     "student_faculty_ratio": university.student_faculty_ratio,
                     "available_majors": university.available_majors,
                     "admission_requirements": university.admission_requirements,
+                    "degree": university.degree,
+                    "url": university.url,
+                    "rating": university.rating,
+                }
+                university_entity.append(
+                    GetUniversityEntity.model_validate(
+                        university_dict, from_attributes=True
+                    )
+                )
+            return ListUniversitiesEntity(
+                page_info=page_info,
+                records=university_entity,
+            )
+
+    @override
+    async def list_featured_universities(
+        self,
+        page: int,
+        limit: int,
+        search: str | None = None,
+        state: UUID | None = None,
+        major: UUID | None = None,
+        degree: UUID | None = None,
+        application_fee: bool | None = None,
+        community_college: bool | None = None,
+    ) -> ListUniversitiesEntity:
+        async with self.session() as session:
+            total_count = (
+                await get_featured_uni_count_async_edgeql.get_featured_uni_count(
+                    session,
+                    search=search,
+                    state=state,
+                    major=major,
+                    degree=degree,
+                    application_fee=application_fee,
+                    community_college=community_college,
+                )
+            )
+            page_info = await paginate(total_count.total_count, page, limit)
+            db_universities = await list_featured_universities_async_edgeql.list_featured_universities(
+                session,
+                offset=page_info.offset,
+                limit=limit,
+                search=search,
+                state=state,
+                major=major,
+                application_fee=application_fee,
+                community_college=community_college,
+                degree=degree,
+            )
+            university_entity = []
+            for university in db_universities:
+                university_dict = {
+                    "id": university.id,
+                    "name": university.name,
+                    "location": university.location,
+                    "image": university.image,
+                    "state": university.state.name,
+                    "description": university.description,
+                    "acceptance_rate": university.acceptance_rate,
+                    "annual_fee": university.annual_fee,
+                    "student_faculty_ratio": university.student_faculty_ratio,
+                    "available_majors": university.available_majors,
+                    "admission_requirements": university.admission_requirements,
+                    "degree": university.degree,
+                    "url": university.url,
+                    "rating": university.rating,
                 }
                 university_entity.append(
                     GetUniversityEntity.model_validate(

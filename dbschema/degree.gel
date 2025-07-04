@@ -1,0 +1,7 @@
+module default {
+    scalar type DegreeNames extending enum<ASSOCIATES_DEGREE, BACHELORS_DEGREE, MASTERS_DEGREE, DOCTORAL_DEGREE>;
+
+    type Degree extending DateTime {
+        required property name -> DegreeNames;    
+    }
+}

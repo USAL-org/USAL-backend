@@ -1,0 +1,4 @@
+SELECT Degree {
+    id,
+    name,
+}

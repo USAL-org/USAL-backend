@@ -17,7 +17,33 @@ FILTERED_UNIVERSITY := (
     AND (.application_fee = application_fee IF EXISTS application_fee ELSE TRUE)
     AND (.community_college = community_college IF EXISTS community_college ELSE TRUE)
     AND (.status = UniversityStatus.ACTIVE)
+    AND (.featured = True)
+    ORDER BY .name ASC
+    OFFSET <optional int64>$offset
+    LIMIT <optional int64>$limit
 )
-SELECT {
-    total_count := count(FILTERED_UNIVERSITY)
+SELECT FILTERED_UNIVERSITY {
+    id,
+    name,
+    location,
+    image,
+    state:{
+        id,
+        name,
+    },
+    description,
+    acceptance_rate,
+    annual_fee,
+    student_faculty_ratio,
+    available_majors:{
+        id,
+        name,
+    },
+    degree :{
+        id,
+        name,
+    },
+    url,
+    rating,  
+    admission_requirements,
 }

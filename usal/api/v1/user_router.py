@@ -78,3 +78,11 @@ async def list_all_universities(
     filter: UniversityFilterRequest = Depends(UniversityFilterRequest),
 ) -> APIResponse[ListUniversitiesResponse]:
     return await controller.list_user_universities(filter)
+
+
+@UserRouter.get("/featured-universities")
+async def list_featured_universities(
+    controller: Annotated[UniversityController, Inject()],
+    filter: UniversityFilterRequest = Depends(UniversityFilterRequest),
+) -> APIResponse[ListUniversitiesResponse]:
+    return await controller.list_featured_universities(filter)
