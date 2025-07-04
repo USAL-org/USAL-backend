@@ -17,6 +17,7 @@ FILTERED_UNIVERSITY := (
     AND (.application_fee = application_fee IF EXISTS application_fee ELSE TRUE)
     AND (.community_college = community_college IF EXISTS community_college ELSE TRUE)
     AND (.status = UniversityStatus.ACTIVE)
+    AND (.featured = True)
 )
 SELECT {
     total_count := count(FILTERED_UNIVERSITY)

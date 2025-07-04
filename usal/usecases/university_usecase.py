@@ -11,6 +11,7 @@ from usal.domain.entities.university_entity import (
     ListAdminUniversitiesEntity,
     ListStatesEntity,
     ListUniversitiesEntity,
+    ListUniversityDegreesEntity,
     ListUniversityMajorsEntity,
 )
 from usal.domain.repositories.university_repo import UniversityRepo
@@ -40,6 +41,11 @@ class UniversityUsecase:
     ) -> ListUniversityMajorsEntity:
         return await self.repo.list_university_majors(search=filter.search)
 
+    async def list_university_degrees(
+        self,
+    ) -> ListUniversityDegreesEntity:
+        return await self.repo.list_university_degrees()
+
     async def add_university(self, request: AddUniversityRequest) -> None:
         return await self.repo.add_university(
             name=request.name,
@@ -55,6 +61,10 @@ class UniversityUsecase:
             available_majors=request.available_majors,
             admission_requirements=request.admission_requirements,
             status=request.status,
+            degrees=request.degrees,
+            rating=request.rating,
+            url=request.url,
+            featured=request.featured,
         )
 
     async def list_universities(
@@ -87,6 +97,32 @@ class UniversityUsecase:
             limit=filter.limit,
             state=filter.state,
             major=filter.major,
+            degree=filter.degree,
+            application_fee=filter.application_fee,
+            community_college=filter.community_college,
+        )
+        return ListUniversitiesEntity(
+            page_info=uni_obj.page_info,
+            records=[
+                GetUniversityEntity.model_validate(
+                    university,
+                    from_attributes=True,
+                )
+                for university in uni_obj.records
+            ],
+        )
+
+    async def list_featured_universities(
+        self,
+        filter: UniversityFilterRequest,
+    ) -> ListUniversitiesEntity:
+        uni_obj = await self.repo.list_featured_universities(
+            search=filter.search,
+            page=filter.page,
+            limit=filter.limit,
+            state=filter.state,
+            major=filter.major,
+            degree=filter.degree,
             application_fee=filter.application_fee,
             community_college=filter.community_college,
         )

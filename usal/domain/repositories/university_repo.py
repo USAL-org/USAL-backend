@@ -7,6 +7,7 @@ from usal.domain.entities.university_entity import (
     ListAdminUniversitiesEntity,
     ListStatesEntity,
     ListUniversitiesEntity,
+    ListUniversityDegreesEntity,
     ListUniversityMajorsEntity,
 )
 
@@ -53,6 +54,17 @@ class UniversityRepo(DbRepo):
         """
 
     @abstractmethod
+    async def list_university_degrees(
+        self,
+    ) -> ListUniversityDegreesEntity:
+        """
+        List all university degrees.
+
+        Returns:
+            ListUniversityMajorsEntity: List of university degrees.
+        """
+
+    @abstractmethod
     async def add_university(
         self,
         name: str,
@@ -68,6 +80,10 @@ class UniversityRepo(DbRepo):
         available_majors: list[UUID],
         admission_requirements: list[str],
         status: UniversityStatus,
+        degrees: list[UUID],
+        rating: float,
+        url: str,
+        featured: bool,
     ) -> None:
         """
         Add a university.
@@ -86,6 +102,11 @@ class UniversityRepo(DbRepo):
             available_majors (list[UUID]): List of available majors in the university.
             admission_requirements (list[str]): List of admission requirements for the university.
             status (UniversityStatus): Status of the university.
+            degrees (list[UUID]): List of degree IDs associated with the university.
+            rating (float): Rating of the university.
+            url (str): URL of the university's official website.
+            featured (bool): Whether the university is featured or not.
+
 
         Returns:
             None
@@ -118,6 +139,7 @@ class UniversityRepo(DbRepo):
         search: str | None = None,
         state: UUID | None = None,
         major: UUID | None = None,
+        degree: UUID | None = None,
         application_fee: bool | None = None,
         community_college: bool | None = None,
     ) -> ListUniversitiesEntity:
@@ -135,4 +157,32 @@ class UniversityRepo(DbRepo):
 
         Returns:
             ListUniversitiesEntity: List of universities.
+        """
+
+    @abstractmethod
+    async def list_featured_universities(
+        self,
+        page: int,
+        limit: int,
+        search: str | None = None,
+        state: UUID | None = None,
+        major: UUID | None = None,
+        degree: UUID | None = None,
+        application_fee: bool | None = None,
+        community_college: bool | None = None,
+    ) -> ListUniversitiesEntity:
+        """
+        List featured universities.
+
+        Parameters:
+            page (int): Page number for pagination.
+            limit (int): Number of records per page.
+            search (str | None): Search term for filtering universities.
+            state (UUID | None): State ID for filtering universities.
+            major (UUID | None): Major ID for filtering universities.
+            application_fee (bool | None): Filter by application fee.
+            community_college (bool | None): Filter by community college status.
+
+        Returns:
+            ListUniversitiesEntity: List of featured universities.
         """

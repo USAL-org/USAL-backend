@@ -5,6 +5,7 @@
     }
     required property updated_at -> datetime {
       default := datetime_current();
+      rewrite update using (datetime_current());
     }
   }
 }

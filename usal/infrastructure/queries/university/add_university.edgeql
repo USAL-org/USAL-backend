@@ -25,4 +25,14 @@ INSERT University{
         ELSE {}
     ),
     status := <UniversityStatus>$status,
+    degree := DISTINCT((
+        FOR id IN array_unpack(<array<uuid>>$degrees)
+        UNION (
+            SELECT Degree 
+            FILTER .id = id
+        )
+    )),
+    url := <str>$url,
+    rating := <float64>$rating,
+    featured := <bool>$featured,
 }

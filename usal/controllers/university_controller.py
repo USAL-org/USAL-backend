@@ -12,8 +12,10 @@ from usal.api.schema.response.university_response import (
     ListAdminUniversitiesResponse,
     ListStatesResponse,
     ListUniversitiesResponse,
+    ListUniversityDegreesResponse,
     ListUniversityMajorsResponse,
     StateResponse,
+    UniversityDegreeResponse,
     UniversityMajorResponse,
 )
 from usal.core.api_response import APIResponse, api_response
@@ -63,6 +65,21 @@ class UniversityController:
             )
         )
 
+    async def list_university_degrees(
+        self,
+    ) -> APIResponse[ListUniversityDegreesResponse]:
+        degrees_obj = await self.usecase.list_university_degrees()
+        return api_response(
+            ListUniversityDegreesResponse(
+                records=[
+                    UniversityDegreeResponse.model_validate(
+                        degree, from_attributes=True
+                    )
+                    for degree in degrees_obj.records
+                ],
+            )
+        )
+
     async def add_university(
         self,
         request: AddUniversityRequest,
@@ -92,6 +109,23 @@ class UniversityController:
         filter: UniversityFilterRequest,
     ) -> APIResponse[ListUniversitiesResponse]:
         universities_obj = await self.usecase.list_user_universities(filter)
+        return api_response(
+            ListUniversitiesResponse(
+                **universities_obj.page_info.model_dump(),
+                records=[
+                    GetUniversityResponse.model_validate(
+                        university, from_attributes=True
+                    )
+                    for university in universities_obj.records
+                ],
+            )
+        )
+
+    async def list_featured_universities(
+        self,
+        filter: UniversityFilterRequest,
+    ) -> APIResponse[ListUniversitiesResponse]:
+        universities_obj = await self.usecase.list_featured_universities(filter)
         return api_response(
             ListUniversitiesResponse(
                 **universities_obj.page_info.model_dump(),

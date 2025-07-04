@@ -18,6 +18,12 @@ module default {
         property view_count -> int32{
             default := 0;
         }
+        property rating -> float64;
+        property url -> str;
+        required property featured -> bool{
+            default := False;
+        }
+        multi degree -> Degree;
         required property status -> UniversityStatus{
             default := UniversityStatus.ACTIVE;
         }

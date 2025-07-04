@@ -2,6 +2,7 @@ WITH
     search := <optional str>$search,
     state := <optional uuid>$state,
     major := <optional uuid>$major,
+    degree := <optional uuid>$degree,
     application_fee := <optional bool>$application_fee,
     community_college := <optional bool>$community_college,
 
@@ -12,6 +13,7 @@ FILTERED_UNIVERSITY := (
     )
     AND (.state.id = state IF EXISTS state ELSE TRUE)
     AND (.available_majors.id = major IF EXISTS major ELSE TRUE)
+    AND (.degree.id = degree IF EXISTS degree ELSE TRUE)
     AND (.application_fee = application_fee IF EXISTS application_fee ELSE TRUE)
     AND (.community_college = community_college IF EXISTS community_college ELSE TRUE)
     AND (.status = UniversityStatus.ACTIVE)
@@ -36,5 +38,11 @@ SELECT FILTERED_UNIVERSITY {
         id,
         name,
     },
+    degree :{
+        id,
+        name,
+    },
+    url,
+    rating, 
     admission_requirements,
 }

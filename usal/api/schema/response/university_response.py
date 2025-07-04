@@ -21,6 +21,23 @@ class ListUniversityMajorsResponse(BaseSchema):
     records: list[UniversityMajorResponse]
 
 
+class UniversityDegreeResponse(BaseSchema):
+    """
+    Response schema for university degrees.
+    """
+
+    id: UUID
+    name: str
+
+
+class ListUniversityDegreesResponse(BaseSchema):
+    """
+    Response schema for listing university degrees.
+    """
+
+    records: list[UniversityDegreeResponse]
+
+
 class StateResponse(BaseSchema):
     """
     Response schema for state details.
@@ -55,6 +72,9 @@ class GetUniversityResponse(BaseSchema):
     student_faculty_ratio: str | None
     available_majors: list[UniversityMajorResponse]
     admission_requirements: list[str]
+    degree: list[UniversityDegreeResponse]
+    url: str
+    rating: float
 
 
 class ListUniversitiesResponse(PaginatedSchema):
@@ -83,6 +103,10 @@ class GetAdminUniversityResponse(BaseSchema):
     admission_requirements: list[str]
     view_count: int
     status: UniversityStatus
+    degree: list[UniversityDegreeResponse]
+    url: str
+    rating: float
+    featured: bool
 
 
 class ListAdminUniversitiesResponse(PaginatedSchema):

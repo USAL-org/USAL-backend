@@ -47,6 +47,36 @@ set {
 """
 
 
+INSERT_DEGREE_QUERY = """
+with
+    existing_actions := (
+        select Degree {
+            name
+        }
+    ),
+    degrees_to_insert := (
+        array_unpack(<array<DegreeNames>>[
+            'ASSOCIATES_DEGREE', 
+            'BACHELORS_DEGREE', 
+            'MASTERS_DEGREE', 
+            'DOCTORAL_DEGREE',])
+        except existing_actions.name
+    )
+for degree_name in degrees_to_insert
+union (
+    insert Degree {
+        name := degree_name
+    }
+);
+"""
+
+VERIFY_DEGREE_QUERY = """
+select Degree {
+    name
+};
+"""
+
+
 async def execute_query(
     client: gel.AsyncIOClient, query: str, params: dict = None
 ) -> None:
@@ -80,6 +110,14 @@ async def create_super_admin(client: gel.AsyncIOClient) -> None:
     }
     await execute_query(client, CREATE_ADMIN_QUERY, params)
     print(f"Admin with username '{username}' created successfully.")
+
+
+async def add_degrees(client: gel.AsyncIOClient) -> None:
+    await client.query(INSERT_DEGREE_QUERY)
+
+    degrees = await client.query(VERIFY_DEGREE_QUERY)
+    for degree in degrees:
+        print(f"- {degree.name}")
 
 
 async def populate_default_data(
@@ -234,6 +272,7 @@ async def main() -> None:
     try:
         await configure_system(client)
         await create_super_admin(client)
+        await add_degrees(client)
         await validate_and_update_default_data(client)
 
     except Exception as e:

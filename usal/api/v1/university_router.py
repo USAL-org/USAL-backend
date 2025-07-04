@@ -13,6 +13,7 @@ from usal.api.schema.response.common_response import MessageResponse
 from usal.api.schema.response.university_response import (
     ListAdminUniversitiesResponse,
     ListStatesResponse,
+    ListUniversityDegreesResponse,
     ListUniversityMajorsResponse,
 )
 from usal.controllers.university_controller import UniversityController
@@ -42,6 +43,13 @@ async def list_university_majors(
     filter: MajorAndStateFilterRequest = Depends(MajorAndStateFilterRequest),
 ) -> APIResponse[ListUniversityMajorsResponse]:
     return await controller.list_university_majors(filter)
+
+
+@UniversityRouter.get("/degrees")
+async def list_university_degrees(
+    controller: Annotated[UniversityController, Inject()],
+) -> APIResponse[ListUniversityDegreesResponse]:
+    return await controller.list_university_degrees()
 
 
 @UniversityRouter.post("/majors")

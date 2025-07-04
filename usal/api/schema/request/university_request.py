@@ -35,6 +35,14 @@ class AddUniversityRequest(BaseRequest):
     status: UniversityStatus = Field(
         description="Status of the university (e.g., active, inactive)"
     )
+    rating: float = Field(description="Rating of the university")
+    url: str = Field(description="URL of the university's official website")
+    featured: bool = Field(
+        default=False, description="Whether the university is featured or not"
+    )
+    degrees: list[UUID] = Field(
+        description="List of degree IDs associated with the university"
+    )
 
 
 class UpdateUniversityRequest(BaseRequest):
@@ -126,6 +134,9 @@ class UniversityFilterRequest(PaginationRequest):
     )
     community_college: bool | None = Field(
         None, description="Whether to filter community colleges"
+    )
+    degree: UUID | None = Field(
+        None, description="Degree ID for filtering universities"
     )
 
 

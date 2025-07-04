@@ -21,6 +21,23 @@ class ListUniversityMajorsEntity(BaseEntity):
     records: list[UniversityMajorEntity]
 
 
+class UniversityDegreeEntity(BaseEntity):
+    """
+    Entity model for university degrees.
+    """
+
+    id: UUID
+    name: str
+
+
+class ListUniversityDegreesEntity(BaseEntity):
+    """
+    Entity model for listing university degrees.
+    """
+
+    records: list[UniversityDegreeEntity]
+
+
 class StateEntity(BaseEntity):
     """
     Entity model for state details.
@@ -55,6 +72,9 @@ class GetUniversityEntity(BaseEntity):
     student_faculty_ratio: str | None
     available_majors: list[UniversityMajorEntity]
     admission_requirements: list[str]
+    degree: list[UniversityDegreeEntity]
+    url: str
+    rating: float
 
 
 class ListUniversitiesEntity(BaseEntity):
@@ -84,6 +104,10 @@ class GetAdminUniversityEntity(BaseEntity):
     admission_requirements: list[str]
     view_count: int
     status: str
+    degree: list[UniversityDegreeEntity]
+    url: str
+    rating: float
+    featured: bool
 
 
 class ListAdminUniversitiesEntity(BaseEntity):
