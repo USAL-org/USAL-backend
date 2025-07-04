@@ -10,7 +10,7 @@ module default {
         required state -> State;
         description -> str;
         required property acceptance_rate -> float64;
-        required property annual_fee -> float64;
+        required property annual_fee -> str;
         student_faculty_ratio -> str;
         multi available_majors -> Major;
         required multi admission_requirements -> str;
